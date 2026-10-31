@@ -4,18 +4,23 @@ import android.database.sqlite.SQLiteConstraintException
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.calendar.tasktodo.data.db.entidad.Actividad
 import com.calendar.tasktodo.data.db.entidad.Clase
+import com.calendar.tasktodo.data.db.entidad.EstadoActividad
 import com.calendar.tasktodo.data.db.entidad.Materia
+import com.calendar.tasktodo.data.db.entidad.TipoActividad
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.LocalTime
 
 /** Las reglas que solo Room garantiza: claves foráneas, cascadas, índices únicos y consultas. */
@@ -123,6 +128,46 @@ class HorarioDaoTest {
         val conteo = materias.observarConConteo().first().associate { it.materia.nombre to it.clases }
 
         assertEquals(mapOf("Cálculo" to 3, "Física" to 1), conteo)
+    }
+
+    @Test
+    fun eliminarUnaMateriaDejaSusActividadesSinMateria_RF_03() = runTest {
+        val (calculo, _) = cargar()
+        val actividades = db.actividadDao()
+        val id = actividades.insertar(
+            Actividad(titulo = "Ejercicios", tipo = TipoActividad.TAREA, fecha = LocalDate.of(2026, 11, 2), materiaId = calculo),
+        )
+
+        materias.eliminar(materias.obtener(calculo)!!)
+
+        val actividad = actividades.obtenerConMateria(id)!!
+        assertNull(actividad.actividad.materiaId)
+        assertNull(actividad.materiaNombre)
+    }
+
+    @Test
+    fun lasConsultasDeActividadesRespetanFechaEstadoYOrden() = runTest {
+        val (calculo, _) = cargar()
+        val actividades = db.actividadDao()
+        val hoy = LocalDate.of(2026, 10, 30)
+        actividades.insertar(Actividad(titulo = "Sin hora", tipo = TipoActividad.TAREA, fecha = hoy))
+        actividades.insertar(Actividad(titulo = "Tarde", tipo = TipoActividad.CHARLA, fecha = hoy, hora = hora(16)))
+        actividades.insertar(Actividad(titulo = "Mañana", tipo = TipoActividad.EXAMEN, fecha = hoy, hora = hora(8), materiaId = calculo))
+        actividades.insertar(Actividad(titulo = "Atrasada", tipo = TipoActividad.TAREA, fecha = hoy.minusDays(2)))
+        actividades.insertar(Actividad(titulo = "Examen viejo", tipo = TipoActividad.EXAMEN, fecha = hoy.minusDays(1)))
+        actividades.insertar(
+            Actividad(titulo = "Hecha", tipo = TipoActividad.TAREA, fecha = hoy.minusDays(1), estado = EstadoActividad.CUMPLIDA),
+        )
+
+        assertEquals(listOf("Mañana", "Tarde", "Sin hora"), actividades.observarDelDia(hoy).first().map { it.actividad.titulo })
+        assertEquals(listOf("Atrasada"), actividades.observarAtrasadas(hoy).first().map { it.actividad.titulo })
+        assertEquals("Cálculo", actividades.observarDelDia(hoy).first().first().materiaNombre)
+        assertEquals(
+            listOf("Mañana"),
+            actividades.observarProximasDeMateria(calculo, hoy, 5).first().map { it.actividad.titulo },
+        )
+        // Las tres de hoy, la atrasada y el examen de ayer; la cumplida no cuenta
+        assertEquals(5, actividades.pendientesEntre(hoy.minusDays(2), hoy).size)
     }
 
     private fun hora(h: Int, m: Int = 0) = LocalTime.of(h, m)

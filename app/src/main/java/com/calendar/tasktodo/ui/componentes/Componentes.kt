@@ -23,10 +23,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -236,6 +238,48 @@ fun CampoHora(
     if (abierto) {
         val es24 = android.text.format.DateFormat.is24HourFormat(LocalContext.current)
         val estado = rememberTimePickerState(hora.hour, hora.minute, es24)
+        AlertDialog(
+            onDismissRequest = { abierto = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    onCambio(LocalTime.of(estado.hour, estado.minute))
+                    abierto = false
+                }) { Text("Aceptar") }
+            },
+            dismissButton = { TextButton(onClick = { abierto = false }) { Text("Cancelar") } },
+            text = { TimePicker(estado) },
+        )
+    }
+}
+
+/** Como [CampoHora], pero la hora es opcional y se puede quitar con ✕. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CampoHoraOpcional(
+    etiqueta: String,
+    hora: LocalTime?,
+    formato: DateTimeFormatter,
+    onCambio: (LocalTime?) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var abierto by remember { mutableStateOf(false) }
+    Column(modifier) {
+        Text(etiqueta, style = MaterialTheme.typography.labelLarge)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            OutlinedButton(onClick = { abierto = true }, modifier = Modifier.weight(1f)) {
+                Text(hora?.format(formato) ?: "Sin hora", style = MaterialTheme.typography.titleMedium)
+            }
+            if (hora != null) {
+                IconButton(onClick = { onCambio(null) }) {
+                    Icon(Icons.Filled.Close, contentDescription = "Quitar hora")
+                }
+            }
+        }
+    }
+    if (abierto) {
+        val es24 = android.text.format.DateFormat.is24HourFormat(LocalContext.current)
+        val inicial = hora ?: LocalTime.of(9, 0)
+        val estado = rememberTimePickerState(inicial.hour, inicial.minute, es24)
         AlertDialog(
             onDismissRequest = { abierto = false },
             confirmButton = {

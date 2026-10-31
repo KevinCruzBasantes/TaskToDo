@@ -28,3 +28,18 @@ data class FormClase(val id: Long? = null, val materiaId: Long? = null)
 
 @Serializable
 data class DetalleClase(val id: Long)
+
+@Serializable
+data object Actividades
+
+@Serializable
+data class FormActividad(val id: Long? = null, val fecha: String? = null)
+
+@Serializable
+data class DetalleActividad(val id: Long)
+
+@Serializable
+data object AjustesAvisos
+
+@Serializable
+data object GuiaMiui

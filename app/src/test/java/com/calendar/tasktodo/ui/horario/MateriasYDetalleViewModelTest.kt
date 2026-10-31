@@ -40,10 +40,33 @@ class MateriasYDetalleViewModelTest {
     }
 
     @Test
+    fun `el detalle de clase muestra las proximas actividades de su materia (CP-2_10)`() = runTest {
+        horario.actividades.value = (1..7).map {
+            com.calendar.tasktodo.data.db.entidad.Actividad(
+                id = 200L + it, titulo = "Tarea $it", tipo = com.calendar.tasktodo.data.db.entidad.TipoActividad.TAREA,
+                fecha = DatosDePrueba.HOY.plusDays(8L - it), materiaId = 2,
+            )
+        } + DatosDePrueba.tareaAtrasada
+        val estado = observar(DetalleClaseViewModel(horario.repositorio, horario.actividadRepositorio, DatosDePrueba.reloj, id = 13).estado)
+
+        assertEquals(listOf("Tarea 7", "Tarea 6", "Tarea 5", "Tarea 4", "Tarea 3"), estado.value.proximas.map { it.actividad.titulo })
+    }
+
+    @Test
+    fun `eliminar una materia deja sus actividades sin materia (RF-03)`() = runTest {
+        val vm = MateriasViewModel(horario.repositorio)
+
+        vm.eliminarTodas()
+
+        assertEquals(4, horario.actividades.value.size)
+        assertTrue(horario.actividades.value.all { it.materiaId == null })
+    }
+
+    @Test
     fun `eliminar una clase la quita de todas las semanas (CP-1_14)`() = runTest {
-        val detalle = DetalleClaseViewModel(horario.repositorio, id = 12)
+        val detalle = DetalleClaseViewModel(horario.repositorio, horario.actividadRepositorio, DatosDePrueba.reloj, id = 12)
         val estadoDetalle = observar(detalle.estado)
-        val dia = DiaViewModel(horario.repositorio, DatosDePrueba.reloj)
+        val dia = DiaViewModel(horario.repositorio, horario.actividadRepositorio, DatosDePrueba.reloj)
         val estadoDia = observar(dia.estado)
         assertEquals("Cálculo", estadoDetalle.value.clase?.materiaNombre)
 
@@ -52,7 +75,7 @@ class MateriasYDetalleViewModelTest {
         assertNull(estadoDetalle.value.clase)
         listOf(DatosDePrueba.HOY, LocalDate.of(2026, 11, 6), LocalDate.of(2026, 11, 13)).forEach {
             dia.irA(it)
-            assertTrue("el $it", estadoDia.value.clases.isEmpty())
+            assertTrue("el $it", estadoDia.value.conHora.none { e -> e is com.calendar.tasktodo.ui.dia.ElementoDia.DeClase })
         }
     }
 }

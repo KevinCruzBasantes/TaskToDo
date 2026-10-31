@@ -1,36 +1,66 @@
 package com.calendar.tasktodo.prueba
 
+import com.calendar.tasktodo.data.db.dao.ActividadDao
 import com.calendar.tasktodo.data.db.dao.ClaseDao
 import com.calendar.tasktodo.data.db.dao.MateriaDao
+import com.calendar.tasktodo.data.db.entidad.Actividad
+import com.calendar.tasktodo.data.db.entidad.ActividadConMateria
 import com.calendar.tasktodo.data.db.entidad.Clase
 import com.calendar.tasktodo.data.db.entidad.ClaseConMateria
+import com.calendar.tasktodo.data.db.entidad.EstadoActividad
 import com.calendar.tasktodo.data.db.entidad.Materia
 import com.calendar.tasktodo.data.db.entidad.MateriaConConteo
+import com.calendar.tasktodo.data.db.entidad.TipoActividad
+import com.calendar.tasktodo.data.repositorio.ActividadRepository
 import com.calendar.tasktodo.data.repositorio.HorarioRepository
+import com.calendar.tasktodo.data.repositorio.ObservadorCambios
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.LocalTime
 
 /**
- * DAOs en memoria con las mismas reglas que Room: nombre único sin distinguir mayúsculas y
- * clases borradas en cascada con su materia. Las reglas reales se prueban en androidTest.
+ * DAOs en memoria con las mismas reglas que Room: clases borradas en cascada con su materia,
+ * actividades que quedan sin materia (SET_NULL) y el mismo orden de las consultas. Las reglas
+ * reales se prueban en androidTest.
  */
 class HorarioFalso {
 
     val materias = MutableStateFlow<List<Materia>>(emptyList())
     val clases = MutableStateFlow<List<Clase>>(emptyList())
+    val actividades = MutableStateFlow<List<Actividad>>(emptyList())
+
+    /** Cuántas veces los repositorios avisaron de un cambio (para los avisos). */
+    var cambiosAvisados = 0
+        private set
+
     /** Lejos de los ids de [DatosDePrueba], para que una inserción no choque con ellos. */
     private var siguienteId = 100L
+
+    private val observador = ObservadorCambios { cambiosAvisados++ }
 
     private fun conMateria(clase: Clase): ClaseConMateria? =
         materias.value.firstOrNull { it.id == clase.materiaId }?.let { ClaseConMateria(clase, it.nombre, it.color) }
 
-    private fun unidas(): Flow<List<ClaseConMateria>> =
-        combine(materias, clases) { _, lista -> lista.mapNotNull(::conMateria) }
+    private fun conMateria(actividad: Actividad): ActividadConMateria {
+        val materia = materias.value.firstOrNull { it.id == actividad.materiaId }
+        return ActividadConMateria(actividad, materia?.nombre, materia?.color)
+    }
+
+    private fun unidas(): Flow<List<ClaseConMateria>> = combine(materias, clases) { _, lista -> lista.mapNotNull(::conMateria) }
+
+    /** Mismo orden que la consulta: por fecha, las sin hora al final, y por título. */
+    private val orden = compareBy<Actividad>({ it.fecha }, { it.hora == null }, { it.hora }, { it.titulo })
+
+    private fun actividadesUnidas(filtro: (Actividad) -> Boolean): Flow<List<ActividadConMateria>> =
+        combine(materias, actividades) { _, lista -> lista.filter(filtro).sortedWith(orden).map(::conMateria) }
+
+    private fun esAtrasada(a: Actividad, hoy: LocalDate) =
+        a.tipo == TipoActividad.TAREA && a.estado == EstadoActividad.PENDIENTE && a.fecha.isBefore(hoy)
 
     val materiaDao = object : MateriaDao {
         override fun observarConConteo() = combine(materias, clases) { lista, todas ->
@@ -55,11 +85,13 @@ class HorarioFalso {
 
         override suspend fun eliminar(materia: Materia) {
             clases.update { lista -> lista.filterNot { it.materiaId == materia.id } }
+            actividades.update { lista -> lista.map { if (it.materiaId == materia.id) it.copy(materiaId = null) else it } }
             materias.update { lista -> lista.filterNot { it.id == materia.id } }
         }
 
         override suspend fun eliminarTodas() {
             clases.value = emptyList()
+            actividades.update { lista -> lista.map { it.copy(materiaId = null) } }
             materias.value = emptyList()
         }
     }
@@ -94,5 +126,52 @@ class HorarioFalso {
         override suspend fun eliminar(clase: Clase) = clases.update { lista -> lista.filterNot { it.id == clase.id } }
     }
 
-    val repositorio = HorarioRepository(materiaDao, claseDao)
+    val actividadDao = object : ActividadDao {
+        override fun observarDelDia(fecha: LocalDate) = actividadesUnidas { it.fecha == fecha }
+
+        override fun observarAtrasadas(hoy: LocalDate) = actividadesUnidas { esAtrasada(it, hoy) }
+
+        override fun observarTodas() = actividadesUnidas { true }
+
+        override fun observar(id: Long) = actividadesUnidas { it.id == id }.map { it.firstOrNull() }
+
+        override fun observarProximasDeMateria(materiaId: Long, hoy: LocalDate, limite: Int) =
+            actividadesUnidas { it.materiaId == materiaId && it.estado == EstadoActividad.PENDIENTE && !it.fecha.isBefore(hoy) }
+                .map { it.take(limite) }
+
+        override suspend fun obtenerConMateria(id: Long) = actividades.value.firstOrNull { it.id == id }?.let(::conMateria)
+
+        override suspend fun obtener(id: Long) = actividades.value.firstOrNull { it.id == id }
+
+        override suspend fun pendientesEntre(desde: LocalDate, hasta: LocalDate) =
+            actividades.value.filter { it.estado == EstadoActividad.PENDIENTE && !it.fecha.isBefore(desde) && !it.fecha.isAfter(hasta) }
+
+        override suspend fun delDia(fecha: LocalDate) =
+            actividades.value.filter { it.fecha == fecha }.sortedWith(orden).map(::conMateria)
+
+        override suspend fun atrasadas(hoy: LocalDate) =
+            actividades.value.filter { esAtrasada(it, hoy) }.sortedWith(orden).map(::conMateria)
+
+        override suspend fun cambiarEstado(id: Long, estado: EstadoActividad) =
+            actividades.update { lista -> lista.map { if (it.id == id) it.copy(estado = estado) else it } }
+
+        override suspend fun cambiarFecha(id: Long, fecha: LocalDate) =
+            actividades.update { lista -> lista.map { if (it.id == id) it.copy(fecha = fecha) else it } }
+
+        override suspend fun insertar(actividad: Actividad): Long {
+            val id = siguienteId++
+            actividades.update { it + actividad.copy(id = id) }
+            return id
+        }
+
+        override suspend fun actualizar(actividad: Actividad) =
+            actividades.update { lista -> lista.map { if (it.id == actividad.id) actividad else it } }
+
+        override suspend fun eliminar(actividad: Actividad) =
+            actividades.update { lista -> lista.filterNot { it.id == actividad.id } }
+    }
+
+    val repositorio = HorarioRepository(materiaDao, claseDao, observador)
+
+    val actividadRepositorio = ActividadRepository(actividadDao, observador)
 }

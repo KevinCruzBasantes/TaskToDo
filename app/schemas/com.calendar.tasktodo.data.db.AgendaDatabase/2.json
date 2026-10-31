@@ -1,0 +1,229 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "87483ce5c4f1b2d2541184269274bc10",
+    "entities": [
+      {
+        "tableName": "materia",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `nombre` TEXT NOT NULL COLLATE NOCASE, `color` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nombre",
+            "columnName": "nombre",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "color",
+            "columnName": "color",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_materia_nombre",
+            "unique": true,
+            "columnNames": [
+              "nombre"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_materia_nombre` ON `${TABLE_NAME}` (`nombre`)"
+          }
+        ]
+      },
+      {
+        "tableName": "clase",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `materia_id` INTEGER NOT NULL, `dia_semana` INTEGER NOT NULL, `hora_inicio` TEXT NOT NULL, `hora_fin` TEXT NOT NULL, `aula` TEXT, FOREIGN KEY(`materia_id`) REFERENCES `materia`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "materiaId",
+            "columnName": "materia_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "diaSemana",
+            "columnName": "dia_semana",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "horaInicio",
+            "columnName": "hora_inicio",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "horaFin",
+            "columnName": "hora_fin",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "aula",
+            "columnName": "aula",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_clase_materia_id",
+            "unique": false,
+            "columnNames": [
+              "materia_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_clase_materia_id` ON `${TABLE_NAME}` (`materia_id`)"
+          },
+          {
+            "name": "index_clase_dia_semana",
+            "unique": false,
+            "columnNames": [
+              "dia_semana"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_clase_dia_semana` ON `${TABLE_NAME}` (`dia_semana`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "materia",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "materia_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "actividad",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `titulo` TEXT NOT NULL, `tipo` TEXT NOT NULL, `fecha` TEXT NOT NULL, `hora` TEXT, `materia_id` INTEGER, `notas` TEXT, `aviso_minutos_antes` INTEGER, `estado` TEXT NOT NULL, FOREIGN KEY(`materia_id`) REFERENCES `materia`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "titulo",
+            "columnName": "titulo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tipo",
+            "columnName": "tipo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fecha",
+            "columnName": "fecha",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hora",
+            "columnName": "hora",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "materiaId",
+            "columnName": "materia_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "notas",
+            "columnName": "notas",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "avisoMinutosAntes",
+            "columnName": "aviso_minutos_antes",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "estado",
+            "columnName": "estado",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_actividad_fecha",
+            "unique": false,
+            "columnNames": [
+              "fecha"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_actividad_fecha` ON `${TABLE_NAME}` (`fecha`)"
+          },
+          {
+            "name": "index_actividad_materia_id",
+            "unique": false,
+            "columnNames": [
+              "materia_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_actividad_materia_id` ON `${TABLE_NAME}` (`materia_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "materia",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "materia_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '87483ce5c4f1b2d2541184269274bc10')"
+    ]
+  }
+}

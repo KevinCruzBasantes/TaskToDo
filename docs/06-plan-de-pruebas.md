@@ -62,6 +62,8 @@ flowchart TB
 | `AlmacenRespaldos` | Usa `DocumentFile` sobre la carpeta | Usa un directorio temporal |
 | `EstadoSistema` | Lee permisos y batería | Devuelve valores fijados por la prueba |
 | `Clock` | `Clock.systemDefaultZone()` | `Clock.fixed(...)` |
+| `DataStore<Preferences>` | DataStore en un archivo | `DataStoreEnMemoria`: en Windows, el DataStore real no logra renombrar su archivo temporal dentro de las pruebas de JVM (`Unable to rename …preferences_pb.tmp`). El real se prueba en el celular. |
+| `Notificador` | Usa `NotificationManager` | Guarda en una lista qué se notificó |
 
 **Comandos útiles en el Xiaomi**
 

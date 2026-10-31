@@ -14,10 +14,10 @@ import androidx.compose.ui.platform.LocalContext
 import com.calendar.tasktodo.data.db.AgendaDatabase
 import com.calendar.tasktodo.ui.componentes.Pantalla
 
-/** Ajustes. Avisos, respaldo y la guía de MIUI llegan en los incrementos 2 y 3. */
+/** Ajustes. El respaldo llega en el incremento 3. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AjustesScreen(onMaterias: () -> Unit) {
+fun AjustesScreen(onMaterias: () -> Unit, onAvisos: () -> Unit, onGuiaMiui: () -> Unit) {
     val context = LocalContext.current
     val version = remember {
         context.packageManager.getPackageInfo(context.packageName, 0).versionName.orEmpty()
@@ -25,6 +25,18 @@ fun AjustesScreen(onMaterias: () -> Unit) {
 
     Pantalla(enBarra = true, topBar = { TopAppBar(title = { Text("Ajustes") }) }) { modifier ->
         Column(modifier) {
+            ListItem(
+                headlineContent = { Text("Avisos") },
+                supportingContent = { Text("Qué avisos llegan y a qué hora") },
+                modifier = Modifier.clickable(onClick = onAvisos),
+            )
+            HorizontalDivider()
+            ListItem(
+                headlineContent = { Text("Revisar avisos en este celular") },
+                supportingContent = { Text("Permisos, batería e inicio automático (guía de MIUI)") },
+                modifier = Modifier.clickable(onClick = onGuiaMiui),
+            )
+            HorizontalDivider()
             ListItem(
                 headlineContent = { Text("Materias") },
                 supportingContent = { Text("Agregar, editar o eliminar materias") },

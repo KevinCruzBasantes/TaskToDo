@@ -10,6 +10,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -26,11 +27,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.calendar.tasktodo.ui.componentes.DialogoConfirmar
+import com.calendar.tasktodo.ui.componentes.FilaActividad
 import com.calendar.tasktodo.ui.componentes.FranjaMateria
 import com.calendar.tasktodo.ui.componentes.Pantalla
 import com.calendar.tasktodo.ui.nombre
 import com.calendar.tasktodo.ui.rangoHoras
 import com.calendar.tasktodo.ui.rememberFormatoHora
+import com.calendar.tasktodo.ui.textoCorto
 
 /** Detalle de una clase (CU-05), con editar y eliminar (CU-04). */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,6 +42,7 @@ fun DetalleClaseScreen(
     id: Long,
     onAtras: () -> Unit,
     onEditar: (Long) -> Unit,
+    onAbrirActividad: (Long) -> Unit,
     viewModel: DetalleClaseViewModel = viewModel(factory = DetalleClaseViewModel.factory(id)),
 ) {
     val estado by viewModel.estado.collectAsStateWithLifecycle()
@@ -67,8 +71,9 @@ fun DetalleClaseScreen(
         },
     ) { modifier ->
         if (clase == null) return@Pantalla
+        Column(modifier) {
         Row(
-            modifier
+            Modifier
                 .padding(16.dp)
                 .height(IntrinsicSize.Min),
         ) {
@@ -84,6 +89,30 @@ fun DetalleClaseScreen(
                     Text("Aula $it", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
+        }
+        HorizontalDivider()
+        Text(
+            "PRÓXIMAS ACTIVIDADES DE ${clase.materiaNombre.uppercase()}",
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 4.dp),
+        )
+        if (estado.proximas.isEmpty()) {
+            Text(
+                "No tiene actividades próximas.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 16.dp),
+            )
+        }
+        estado.proximas.forEach { item ->
+            FilaActividad(
+                item, estado.hoy, formatoHora,
+                onCambiarCumplida = { viewModel.cambiarCumplida(item.actividad.id, it) },
+                onClick = { onAbrirActividad(item.actividad.id) },
+                detalleExtra = item.actividad.fecha.textoCorto(),
+            )
+        }
         }
     }
 

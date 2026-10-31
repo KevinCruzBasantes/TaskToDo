@@ -11,8 +11,12 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.calendar.tasktodo.data.db.AgendaDatabase
+import com.calendar.tasktodo.data.db.entidad.Actividad
 import com.calendar.tasktodo.data.db.entidad.Clase
+import com.calendar.tasktodo.data.db.entidad.EstadoActividad
 import com.calendar.tasktodo.data.db.entidad.Materia
+import com.calendar.tasktodo.data.db.entidad.TipoActividad
+import com.calendar.tasktodo.data.repositorio.ActividadRepository
 import com.calendar.tasktodo.data.repositorio.HorarioRepository
 import com.calendar.tasktodo.ui.dia.DiaScreen
 import com.calendar.tasktodo.ui.dia.DiaViewModel
@@ -27,6 +31,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.time.Clock
 import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneOffset
@@ -39,6 +44,7 @@ class DiaYBienvenidaUiTest {
 
     private lateinit var db: AgendaDatabase
     private lateinit var repositorio: HorarioRepository
+    private lateinit var actividades: ActividadRepository
 
     /** Viernes 30 de octubre de 2026, 10:00. */
     private val reloj = Clock.fixed(LocalDateTime.of(2026, 10, 30, 10, 0).toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
@@ -47,6 +53,7 @@ class DiaYBienvenidaUiTest {
     fun crear() {
         db = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), AgendaDatabase::class.java).build()
         repositorio = HorarioRepository(db.materiaDao(), db.claseDao())
+        actividades = ActividadRepository(db.actividadDao())
     }
 
     @After
@@ -76,10 +83,10 @@ class DiaYBienvenidaUiTest {
                 Clase(materiaId = calculo, diaSemana = DayOfWeek.FRIDAY, horaInicio = LocalTime.of(7, 0), horaFin = LocalTime.of(9, 0)),
             )
         }
-        val viewModel = DiaViewModel(repositorio, reloj)
+        val viewModel = DiaViewModel(repositorio, actividades, reloj)
         compose.setContent {
             TaskToDoTheme {
-                DiaScreen(null, {}, {}, viewModel = viewModel)
+                DiaScreen(null, {}, {}, {}, viewModel = viewModel)
             }
         }
         compose.onNodeWithText("Viernes 30 de octubre").assertExists()
@@ -87,13 +94,37 @@ class DiaYBienvenidaUiTest {
 
         compose.onNodeWithContentDescription("Día anterior").performClick()
         compose.onNodeWithText("Jueves 29 de octubre").assertExists()
-        esperarTexto("No hay clases este día")
+        esperarTexto("No hay nada para este día")
 
         compose.onNodeWithText("Hoy").performClick()
         compose.onNodeWithText("Viernes 30 de octubre").assertExists()
 
         compose.onNodeWithContentDescription("Día siguiente").performClick()
         compose.onNodeWithText("Sábado 31 de octubre").assertExists()
+    }
+
+    @Test
+    fun elCheckSeMarcaYDesmarcaConUnToqueYTocarAbreElDetalle_CP_2_06_CP_2_13() {
+        val id = runBlocking {
+            db.actividadDao().insertar(Actividad(titulo = "Leer artículo", tipo = TipoActividad.TAREA, fecha = LocalDate.of(2026, 10, 30)))
+        }
+        var abierta: Long? = null
+        val viewModel = DiaViewModel(repositorio, actividades, reloj)
+        compose.setContent {
+            TaskToDoTheme {
+                DiaScreen(null, {}, onAbrirActividad = { abierta = it }, onNuevaActividad = {}, viewModel = viewModel)
+            }
+        }
+        esperarTexto("🗒 Leer artículo")
+
+        compose.onNodeWithContentDescription("Marcar Leer artículo").performClick()
+        compose.waitUntil(5_000) { runBlocking { db.actividadDao().obtener(id)?.estado } == EstadoActividad.CUMPLIDA }
+
+        compose.onNodeWithContentDescription("Desmarcar Leer artículo").performClick()
+        compose.waitUntil(5_000) { runBlocking { db.actividadDao().obtener(id)?.estado } == EstadoActividad.PENDIENTE }
+
+        compose.onNodeWithText("🗒 Leer artículo").performClick()
+        compose.waitUntil(5_000) { abierta == id }
     }
 
     /** Room emite en su propio hilo: se espera a que el dato llegue a la pantalla. */

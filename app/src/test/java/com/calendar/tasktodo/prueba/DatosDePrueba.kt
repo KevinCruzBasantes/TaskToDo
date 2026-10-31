@@ -1,7 +1,9 @@
 package com.calendar.tasktodo.prueba
 
+import com.calendar.tasktodo.data.db.entidad.Actividad
 import com.calendar.tasktodo.data.db.entidad.Clase
 import com.calendar.tasktodo.data.db.entidad.Materia
+import com.calendar.tasktodo.data.db.entidad.TipoActividad
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.StateFlow
@@ -44,12 +46,26 @@ object DatosDePrueba {
         Clase(id = 13, materiaId = 2, diaSemana = DayOfWeek.TUESDAY, horaInicio = hora(9), horaFin = hora(11), aula = "Lab 2"),
     )
 
+    /**
+     * Una tarea atrasada 3 días, un examen ayer sin check, una tarea hoy sin hora y un examen el
+     * 6 de noviembre a las 10:30 (plan de pruebas §1).
+     */
+    val tareaAtrasada = Actividad(id = 40, titulo = "Informe de laboratorio", tipo = TipoActividad.TAREA, fecha = HOY.minusDays(3), materiaId = 2)
+    val examenAyer = Actividad(id = 41, titulo = "Parcial de Inglés", tipo = TipoActividad.EXAMEN, fecha = HOY.minusDays(1), hora = hora(8), materiaId = 3)
+    val tareaHoySinHora = Actividad(id = 42, titulo = "Leer artículo", tipo = TipoActividad.TAREA, fecha = HOY, avisoMinutosAntes = 0)
+    val examenProximo = Actividad(
+        id = 43, titulo = "Examen parcial", tipo = TipoActividad.EXAMEN, fecha = LocalDate.of(2026, 11, 6),
+        hora = hora(10, 30), materiaId = 2, avisoMinutosAntes = 30,
+    )
+    val actividades = listOf(tareaAtrasada, examenAyer, tareaHoySinHora, examenProximo)
+
     fun hora(h: Int, m: Int = 0): LocalTime = LocalTime.of(h, m)
 
-    /** Un horario falso cargado con las tres materias y las cuatro clases. */
+    /** Un horario falso cargado con las tres materias, las cuatro clases y las cuatro actividades. */
     fun horarioCargado(): HorarioFalso = HorarioFalso().apply {
         materias.value = listOf(calculo, fisica, ingles)
         clases.value = DatosDePrueba.clases
+        actividades.value = DatosDePrueba.actividades
     }
 }
 

@@ -15,6 +15,7 @@ import java.time.LocalTime
 class HorarioRepository(
     private val materiaDao: MateriaDao,
     private val claseDao: ClaseDao,
+    private val observador: ObservadorCambios = ObservadorCambios.NINGUNO,
 ) {
     val materias: Flow<List<Materia>> = materiaDao.observarTodas()
 
@@ -39,19 +40,28 @@ class HorarioRepository(
     suspend fun existeMateria(nombre: String, excluirId: Long = 0): Boolean =
         materiaDao.observarTodas().first().any { it.id != excluirId && it.nombre.equals(nombre, ignoreCase = true) }
 
-    suspend fun guardarMateria(materia: Materia): Long =
-        if (materia.id == 0L) {
+    suspend fun guardarMateria(materia: Materia): Long {
+        val id = if (materia.id == 0L) {
             materiaDao.insertar(materia)
         } else {
             materiaDao.actualizar(materia)
             materia.id
         }
+        observador.huboCambios()
+        return id
+    }
 
-    /** Borra la materia y sus clases (RF-03). */
-    suspend fun eliminarMateria(materia: Materia) = materiaDao.eliminar(materia)
+    /** Borra la materia y sus clases; sus actividades quedan sin materia (RF-03). */
+    suspend fun eliminarMateria(materia: Materia) {
+        materiaDao.eliminar(materia)
+        observador.huboCambios()
+    }
 
     /** Borra todas las materias y, en cascada, todas las clases (RF-04). */
-    suspend fun eliminarTodasLasMaterias() = materiaDao.eliminarTodas()
+    suspend fun eliminarTodasLasMaterias() {
+        materiaDao.eliminarTodas()
+        observador.huboCambios()
+    }
 
     suspend fun contarClasesDeMateria(materiaId: Long): Int = claseDao.contarDeMateria(materiaId)
 
@@ -62,13 +72,19 @@ class HorarioRepository(
         excluirId: Long = 0,
     ): List<ClaseConMateria> = claseDao.cruces(dia, inicio, fin, excluirId)
 
-    suspend fun guardarClase(clase: Clase): Long =
-        if (clase.id == 0L) {
+    suspend fun guardarClase(clase: Clase): Long {
+        val id = if (clase.id == 0L) {
             claseDao.insertar(clase)
         } else {
             claseDao.actualizar(clase)
             clase.id
         }
+        observador.huboCambios()
+        return id
+    }
 
-    suspend fun eliminarClase(clase: Clase) = claseDao.eliminar(clase)
+    suspend fun eliminarClase(clase: Clase) {
+        claseDao.eliminar(clase)
+        observador.huboCambios()
+    }
 }

@@ -4,6 +4,7 @@ import android.text.format.DateFormat
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import com.calendar.tasktodo.data.db.entidad.TipoActividad
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
@@ -35,3 +36,37 @@ fun rememberFormatoHora(): DateTimeFormatter {
 
 fun rangoHoras(inicio: LocalTime, fin: LocalTime, formato: DateTimeFormatter): String =
     "${inicio.format(formato)} – ${fin.format(formato)}"
+
+private val FORMATO_FECHA_CORTA = DateTimeFormatter.ofPattern("EEE d MMM", ESPANOL)
+
+/** "vie 30 oct". */
+fun LocalDate.textoCorto(): String = format(FORMATO_FECHA_CORTA).replace(".", "")
+
+fun TipoActividad.nombre(): String = when (this) {
+    TipoActividad.TAREA -> "Tarea"
+    TipoActividad.CHARLA -> "Charla"
+    TipoActividad.SIMULACRO -> "Simulacro"
+    TipoActividad.EXAMEN -> "Examen"
+    TipoActividad.GYM -> "Gym"
+}
+
+/** Un ícono fijo por tipo, para distinguirlos aunque tengan la misma materia (diseño de interfaz §1). */
+fun TipoActividad.icono(): String = when (this) {
+    TipoActividad.TAREA -> "🗒"
+    TipoActividad.CHARLA -> "🎤"
+    TipoActividad.SIMULACRO -> "⏱"
+    TipoActividad.EXAMEN -> "📝"
+    TipoActividad.GYM -> "🏋"
+}
+
+/** Opciones de aviso del formulario de actividad, en minutos antes; nulo = sin aviso. */
+val OPCIONES_AVISO: List<Int?> = listOf(null, 0, 5, 10, 15, 30, 60, 120, 1440)
+
+fun textoAviso(minutos: Int?, conHora: Boolean, horaSinHora: LocalTime, formato: DateTimeFormatter): String = when {
+    minutos == null -> "Sin aviso"
+    !conHora -> "A las ${horaSinHora.format(formato)}"
+    minutos == 0 -> "A la hora"
+    minutos < 60 -> "$minutos min antes"
+    minutos == 1440 -> "1 día antes"
+    else -> "${minutos / 60} h antes"
+}

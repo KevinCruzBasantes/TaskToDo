@@ -192,6 +192,8 @@ Cada carpeta de pantalla tiene su `…Screen.kt`, su `…ViewModel.kt` y su `…
 
 - **Código fijo:** el código de cada alarma se deriva del `id` de la actividad y del tipo de aviso. Así se puede cancelar o reemplazar, y reprogramar una actividad nunca la duplica.
 - **Ventana de 7 días:** solo se programan los avisos de los próximos 7 días; los demás se programan cuando se acercan, para no tener cientos de alarmas activas. El resumen diario se reprograma para el día siguiente cada vez que suena.
+- **Se recalcula todo:** cada cambio (guardar, marcar, borrar, cambiar un ajuste, reiniciar o abrir la app) calcula de nuevo todos los avisos de la ventana con `PlanificadorAvisos`, una función pura, y `ServicioAvisos` cancela los códigos que ya no tocan y programa el resto. Los códigos programados se guardan en DataStore. Son pocas alarmas, así que es barato, y el resultado siempre es el mismo para el mismo estado.
+- **Mantenimiento diario:** una alarma silenciosa a las 3:00 (`setAndAllowWhileIdle`) solo vuelve a calcular la ventana, para que avance aunque el resumen del día esté desactivado y la app no se abra. Reemplaza al `MantenimientoDiarioWorker` del incremento 2; WorkManager llega con el respaldo automático.
 
 **Dos formas de programar una alarma.** Android ofrece dos tipos de alarma exacta. Para cumplir el margen de ±1 minuto (RNF-10), todos los avisos usan `setAlarmClock`:
 
@@ -411,3 +413,4 @@ El nombre visible sale de `manifestPlaceholders["appLabel"]` en cada tipo de com
 | 8 | kotlinx.serialization para el JSON. | Gson o Moshi. | Ya hace falta para la navegación y no usa reflexión. |
 | 9 | Nombres del dominio en español. | Inglés. | Coinciden con los documentos y el modelo de datos. |
 | 10 | Guía de MIUI y comprobación de pendientes al abrir. | Confiar solo en las alarmas y los workers. | MIUI 13 puede descartarlos con la app cerrada; la comprobación al abrir recupera lo que se perdió (RNF-11). |
+| 11 | Avisos recalculados por completo en cada cambio, con un planificador puro. | Programar y cancelar aviso por aviso. | Evita duplicados y avisos viejos, y se prueba sin Android (incremento 2). |

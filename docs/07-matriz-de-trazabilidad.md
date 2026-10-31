@@ -39,25 +39,25 @@ La matriz conecta cada requerimiento con su caso de uso, los datos que usa, las 
 
 | RF | Resumen | CU | Datos | Pantallas | Pruebas | Inc. | Verificado |
 |---|---|---|---|---|---|---|---|
-| RF-09 | Crear actividad | CU-06 | `actividad` | Formulario de actividad | CP-2.01 | 2 | — |
-| RF-10 | Consultar y filtrar actividades | CU-07 | `actividad`, `materia` | Actividades | CP-2.05 | 2 | — |
-| RF-11 | Editar actividad | CU-06 | `actividad` | Formulario de actividad, Detalle de actividad | CP-2.03 | 2 | — |
-| RF-12 | Eliminar actividad | CU-06 | `actividad` | Detalle de actividad | CP-2.04 | 2 | — |
-| RF-13 | Marcar y desmarcar con check | CU-08 | `actividad` | Hoy, Actividades | CP-2.06 | 2 | — |
-| RF-14 | Tareas atrasadas en el módulo de hoy | CU-09 | `actividad` | Hoy | CP-2.07, CP-2.09 | 2 | — |
-| RF-15 | Exámenes, simulacros y charlas no pasan a hoy | CU-10 | `actividad` | Hoy | CP-2.08 | 2 | — |
-| RF-16 | Próximas actividades en el detalle de clase | CU-05 | `actividad`, `clase` | Detalle de clase | CP-2.10 | 2 | — |
+| RF-09 | Crear actividad | CU-06 | `actividad` | Formulario de actividad | CP-2.01 | 2 | 2026-10-31 · 2.0 |
+| RF-10 | Consultar y filtrar actividades | CU-07 | `actividad`, `materia` | Actividades | CP-2.05 | 2 | 2026-10-31 · 2.0 |
+| RF-11 | Editar actividad | CU-06 | `actividad` | Formulario de actividad, Detalle de actividad | CP-2.03 | 2 | 2026-10-31 · 2.0 |
+| RF-12 | Eliminar actividad | CU-06 | `actividad` | Detalle de actividad | CP-2.04 | 2 | 2026-10-31 · 2.0 |
+| RF-13 | Marcar y desmarcar con check | CU-08 | `actividad` | Hoy, Actividades | CP-2.06 | 2 | 2026-10-31 · 2.0 |
+| RF-14 | Tareas atrasadas en el módulo de hoy | CU-09 | `actividad` | Hoy | CP-2.07, CP-2.09 | 2 | 2026-10-31 · 2.0 |
+| RF-15 | Exámenes, simulacros y charlas no pasan a hoy | CU-10 | `actividad` | Hoy | CP-2.08 | 2 | 2026-10-31 · 2.0 |
+| RF-16 | Próximas actividades en el detalle de clase | CU-05 | `actividad`, `clase` | Detalle de clase | CP-2.10 | 2 | 2026-10-31 · 2.0 |
 
 ### 1.3 Módulo del día
 
 | RF | Resumen | CU | Datos | Pantallas | Pruebas | Inc. | Verificado |
 |---|---|---|---|---|---|---|---|
-| RF-17 | Clases y actividades del día por hora | CU-10 | `clase`, `actividad`, `materia` | Hoy | CP-1.11, CP-2.11 | 1 y 2 | Parcial: 2026-10-31 · 1.1 (clases; las actividades en el inc. 2) |
+| RF-17 | Clases y actividades del día por hora | CU-10 | `clase`, `actividad`, `materia` | Hoy | CP-1.11, CP-2.11 | 1 y 2 | 2026-10-31 · 2.0 |
 | RF-18 | Abrir en el día actual | CU-10 | — | Hoy | CP-1.02 | 1 | 2026-10-31 · 1.1 |
 | RF-19 | Cambiar de día | CU-10 | — | Hoy | CP-1.10 | 1 | 2026-10-31 · 1.1 |
-| RF-20 | Marcar desde el módulo | CU-08 | `actividad` | Hoy | CP-2.06 | 2 | — |
-| RF-21 | Agregar con la fecha del día | CU-06 | `actividad` | Hoy, Formulario de actividad | CP-2.02 | 2 | — |
-| RF-22 | Abrir detalle, o rutina si es gym | CU-10 | `actividad` | Hoy, Detalle de actividad, Sesión de gym | CP-2.13, CP-5.37 | 2 y 5 | — |
+| RF-20 | Marcar desde el módulo | CU-08 | `actividad` | Hoy | CP-2.06 | 2 | 2026-10-31 · 2.0 |
+| RF-21 | Agregar con la fecha del día | CU-06 | `actividad` | Hoy, Formulario de actividad | CP-2.02 | 2 | 2026-10-31 · 2.0 |
+| RF-22 | Abrir detalle, o rutina si es gym | CU-10 | `actividad` | Hoy, Detalle de actividad, Sesión de gym | CP-2.13, CP-5.37 | 2 y 5 | Parcial: 2026-10-31 · 2.0 (detalle; la rutina de gym en el inc. 5) |
 
 ### 1.4 Gym
 
@@ -88,12 +88,12 @@ La matriz conecta cada requerimiento con su caso de uso, los datos que usa, las 
 
 | RF | Resumen | CU | Datos | Pantallas | Pruebas | Inc. | Verificado |
 |---|---|---|---|---|---|---|---|
-| RF-38 | Aviso por actividad, con hora fija si no tiene hora | CU-19, CU-20 | `actividad`, Ajustes | Formulario de actividad, Ajustes y avisos | CP-2.20, CP-2.21, CP-2.23, CP-2.24 | 2 | — |
-| RF-39 | Aviso del día anterior en exámenes y simulacros | CU-19, CU-20 | `actividad`, Ajustes | Ajustes y avisos | CP-2.22 | 2 | — |
+| RF-38 | Aviso por actividad, con hora fija si no tiene hora | CU-19, CU-20 | `actividad`, Ajustes | Formulario de actividad, Ajustes y avisos | CP-2.20, CP-2.21, CP-2.23, CP-2.24 | 2 | 2026-10-31 · 2.0 (manuales CP-2.32 a CP-2.38 hechas por el usuario) |
+| RF-39 | Aviso del día anterior en exámenes y simulacros | CU-19, CU-20 | `actividad`, Ajustes | Ajustes y avisos | CP-2.22 | 2 | 2026-10-31 · 2.0 (manuales CP-2.32 a CP-2.38 hechas por el usuario) |
 | RF-40 | Aviso de gym con la rutina | CU-20 | `actividad`, `dia_gym`, Ajustes | Ajustes y avisos | CP-5.16 | 5 | — |
-| RF-41 | Aviso de clases, desactivado por defecto | CU-19, CU-20 | `clase`, Ajustes | Ajustes y avisos | CP-2.26 | 2 | — |
-| RF-42 | Resumen del día | CU-20 | `actividad`, Ajustes | Ajustes y avisos | CP-2.27 | 2 | — |
-| RF-43 | Marcar desde la notificación, activar por tipo, reprogramar al reiniciar | CU-08, CU-19, CU-20 | `actividad`, Ajustes | Notificación, Ajustes y avisos | CP-2.25, CP-2.30, CP-2.31, CP-2.33, CP-2.37 | 2 | — |
+| RF-41 | Aviso de clases, desactivado por defecto | CU-19, CU-20 | `clase`, Ajustes | Ajustes y avisos | CP-2.26 | 2 | 2026-10-31 · 2.0 (manuales CP-2.32 a CP-2.38 hechas por el usuario) |
+| RF-42 | Resumen del día | CU-20 | `actividad`, Ajustes | Ajustes y avisos | CP-2.27 | 2 | 2026-10-31 · 2.0 (manuales CP-2.32 a CP-2.38 hechas por el usuario) |
+| RF-43 | Marcar desde la notificación, activar por tipo, reprogramar al reiniciar | CU-08, CU-19, CU-20 | `actividad`, Ajustes | Notificación, Ajustes y avisos | CP-2.25, CP-2.30, CP-2.31, CP-2.33, CP-2.37 | 2 | 2026-10-31 · 2.0 (manuales CP-2.32 a CP-2.38 hechas por el usuario) |
 
 ### 1.7 Respaldo
 
@@ -115,14 +115,14 @@ Los RNF valen para toda la app, así que se verifican en cada incremento desde e
 | RNF-01 · Plataforma | Android 8.0+, Kotlin y Compose; probada en Android 12 con MIUI 13 | [Arquitectura §5.1](03-arquitectura.md#51-base-del-proyecto), §4.6 | CP-1.13 | 1 | 2026-10-31 · 1.1 |
 | RNF-02 · Alcance | Un usuario, sin cuentas ni servidor | Arquitectura §1, §4.5 (sin permiso de internet) | Criterio de calidad "Sin cuentas ni red" | 1 | — |
 | RNF-03 · Almacenamiento | Room local, funciona sin internet | [Modelo de datos](02-modelo-de-datos.md) | Criterio de calidad "Sin internet" | 1 | — |
-| RNF-04 · Persistencia | No perder datos; instalar encima con la misma firma | [Modelo de datos §5](02-modelo-de-datos.md#5-versionado-y-migraciones), [arquitectura §5.3](03-arquitectura.md#53-firma-versiones-e-instalación) | CP-1.12, CP-1.15 a CP-1.19, CP-2.12, CP-3.18, CP-5.32, CP-6.11 | 1 | Parcial: 2026-10-31 · 1.1 (firma e instalación encima; migraciones desde el inc. 2) |
+| RNF-04 · Persistencia | No perder datos; instalar encima con la misma firma | [Modelo de datos §5](02-modelo-de-datos.md#5-versionado-y-migraciones), [arquitectura §5.3](03-arquitectura.md#53-firma-versiones-e-instalación) | CP-1.12, CP-1.15 a CP-1.19, CP-2.12, CP-3.18, CP-5.32, CP-6.11 | 1 | Parcial: 2026-10-31 · 2.0 (firma, instalación encima y migración 1→2 con datos reales) |
 | RNF-05 · Respaldo | Fuera de la app, en una carpeta registrada | Arquitectura §4.4 | CP-3.15, CP-3.18 | 3 | — |
 | RNF-06 · Respaldo | JSON con versiones y fecha | [Diagramas §2.2](05-diagramas-de-comportamiento.md#22-respaldar-ahora) | CP-3.01, CP-3.02, CP-3.10 | 3 | — |
 | RNF-07 · Confiabilidad | Cronómetro desde la hora guardada y servicio en primer plano | Arquitectura §4.3, [diagramas §1.3](05-diagramas-de-comportamiento.md#13-recuperar-una-sesión-después-de-un-cierre) | CP-5.34, CP-5.35 | 5 | — |
-| RNF-08 · Usabilidad | Un toque para marcar y para confirmar una serie | [Diseño de interfaz §1](04-diseno-de-interfaz.md#1-principios-de-diseño) | CP-2.06, CP-5.22 | 2 | — |
+| RNF-08 · Usabilidad | Un toque para marcar y para confirmar una serie | [Diseño de interfaz §1](04-diseno-de-interfaz.md#1-principios-de-diseño) | CP-2.06, CP-5.22 | 2 | 2026-10-31 · 2.0 |
 | RNF-09 · Mantenibilidad | MVVM por capas | [Arquitectura §2](03-arquitectura.md#2-capas-mvvm) | Criterio de calidad "Capas MVVM" | 1 | — |
-| RNF-10 · Notificaciones | Avisos con ±1 minuto, con alarmas del sistema | Arquitectura §4.2, [diagramas §3](05-diagramas-de-comportamiento.md#3-programación-de-avisos) | CP-2.28, CP-2.29, CP-2.32, CP-2.38 | 2 | — |
-| RNF-11 · MIUI | Guía de MIUI y comprobación al abrir | Arquitectura §4.6, [diagramas §6](05-diagramas-de-comportamiento.md#6-comprobación-al-abrir) | CP-2.34, CP-2.35, CP-2.36, CP-3.13 | 2 | — |
+| RNF-10 · Notificaciones | Avisos con ±1 minuto, con alarmas del sistema | Arquitectura §4.2, [diagramas §3](05-diagramas-de-comportamiento.md#3-programación-de-avisos) | CP-2.28, CP-2.29, CP-2.32, CP-2.38 | 2 | 2026-10-31 · 2.0 (manuales CP-2.32 y CP-2.38 hechas por el usuario) |
+| RNF-11 · MIUI | Guía de MIUI y comprobación al abrir | Arquitectura §4.6, [diagramas §6](05-diagramas-de-comportamiento.md#6-comprobación-al-abrir) | CP-2.34, CP-2.35, CP-2.36, CP-3.13 | 2 | 2026-10-31 · 2.0 (manuales CP-2.33 a CP-2.36 hechas por el usuario) |
 
 ---
 

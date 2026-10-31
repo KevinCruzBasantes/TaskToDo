@@ -1,8 +1,14 @@
 package com.calendar.tasktodo.ui.navegacion
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
@@ -12,9 +18,12 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
@@ -26,7 +35,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.calendar.tasktodo.ui.actividades.ActividadesScreen
+import com.calendar.tasktodo.ui.actividades.DetalleActividadScreen
+import com.calendar.tasktodo.ui.actividades.FormActividadScreen
+import com.calendar.tasktodo.ui.ajustes.AjustesAvisosScreen
 import com.calendar.tasktodo.ui.ajustes.AjustesScreen
+import com.calendar.tasktodo.ui.ajustes.GuiaMiuiScreen
 import com.calendar.tasktodo.ui.dia.DiaScreen
 import com.calendar.tasktodo.ui.horario.DetalleClaseScreen
 import com.calendar.tasktodo.ui.horario.FormClaseScreen
@@ -34,14 +48,16 @@ import com.calendar.tasktodo.ui.horario.FormMateriaScreen
 import com.calendar.tasktodo.ui.horario.HorarioScreen
 import com.calendar.tasktodo.ui.horario.MateriasScreen
 import com.calendar.tasktodo.ui.inicio.BienvenidaScreen
+import kotlinx.coroutines.flow.StateFlow
 import java.time.LocalDate
 
 private data class Seccion(val ruta: Any, val etiqueta: String, val icono: ImageVector)
 
-/** En el incremento 1 la barra solo tiene Hoy, Calendario y Ajustes (diseño de interfaz §2). */
+/** En el incremento 2 la barra tiene Hoy, Calendario, Actividades y Ajustes (diseño de interfaz §2). */
 private val SECCIONES = listOf(
     Seccion(Dia(), "Hoy", Icons.Filled.Home),
     Seccion(Calendario, "Calendario", Icons.Filled.DateRange),
+    Seccion(Actividades, "Actividades", Icons.AutoMirrored.Filled.List),
     Seccion(Ajustes, "Ajustes", Icons.Filled.Settings),
 )
 
@@ -59,14 +75,32 @@ private fun NavController.volverDesde(entrada: NavBackStackEntry) {
     if (currentBackStackEntry?.id == entrada.id) popBackStack()
 }
 
+/**
+ * @param actividadPedida actividad que pidió abrir una notificación o la alarma de la pantalla de
+ * bloqueo; se abre su detalle y se avisa con [onPedidoAtendido].
+ */
 @Composable
-fun AgendaApp(viewModel: AppViewModel = viewModel(factory = AppViewModel.Factory)) {
+fun AgendaApp(
+    actividadPedida: StateFlow<Long?>,
+    onPedidoAtendido: () -> Unit,
+    viewModel: AppViewModel = viewModel(factory = AppViewModel.Factory),
+) {
     val destinoInicial by viewModel.destinoInicial.collectAsStateWithLifecycle()
+    val mostrarGuiaMiui by viewModel.mostrarGuiaMiui.collectAsStateWithLifecycle()
+    val pedida by actividadPedida.collectAsStateWithLifecycle()
+    PedirPermisoNotificaciones()
     val inicio = destinoInicial ?: return
 
     val nav = rememberNavController()
     val entradaActual by nav.currentBackStackEntryAsState()
     val destino = entradaActual?.destination
+
+    LaunchedEffect(pedida, entradaActual != null) {
+        val id = pedida ?: return@LaunchedEffect
+        if (entradaActual == null) return@LaunchedEffect
+        nav.navigate(DetalleActividad(id)) { launchSingleTop = true }
+        onPedidoAtendido()
+    }
 
     Scaffold(
         contentWindowInsets = WindowInsets(0),
@@ -91,14 +125,18 @@ fun AgendaApp(viewModel: AppViewModel = viewModel(factory = AppViewModel.Factory
                     onNuevaMateria = { nav.navigate(FormMateria()) },
                     onEditarMateria = { nav.navigate(FormMateria(it)) },
                     onAgregarClases = { nav.navigate(FormClase(materiaId = it)) },
-                    onTerminar = { nav.navigate(Dia()) { popUpTo<Bienvenida> { inclusive = true } } },
+                    onTerminar = {
+                        nav.navigate(Dia()) { popUpTo<Bienvenida> { inclusive = true } }
+                        if (mostrarGuiaMiui) nav.navigate(GuiaMiui)
+                    },
                 )
             }
             composable<Dia> { entrada ->
                 DiaScreen(
                     fechaInicial = entrada.toRoute<Dia>().fecha?.let(LocalDate::parse),
                     onAbrirClase = { nav.navigate(DetalleClase(it)) },
-                    onVerHorario = { nav.irASeccion(Calendario) },
+                    onAbrirActividad = { nav.navigate(DetalleActividad(it)) },
+                    onNuevaActividad = { nav.navigate(FormActividad(fecha = it.toString())) },
                 )
             }
             composable<Calendario> {
@@ -109,8 +147,18 @@ fun AgendaApp(viewModel: AppViewModel = viewModel(factory = AppViewModel.Factory
                     onMaterias = { nav.navigate(Materias) },
                 )
             }
+            composable<Actividades> {
+                ActividadesScreen(
+                    onAbrirActividad = { nav.navigate(DetalleActividad(it)) },
+                    onNuevaActividad = { nav.navigate(FormActividad()) },
+                )
+            }
             composable<Ajustes> {
-                AjustesScreen(onMaterias = { nav.navigate(Materias) })
+                AjustesScreen(
+                    onMaterias = { nav.navigate(Materias) },
+                    onAvisos = { nav.navigate(AjustesAvisos) },
+                    onGuiaMiui = { nav.navigate(GuiaMiui) },
+                )
             }
             composable<Materias> { entrada ->
                 MateriasScreen(
@@ -120,10 +168,7 @@ fun AgendaApp(viewModel: AppViewModel = viewModel(factory = AppViewModel.Factory
                 )
             }
             composable<FormMateria> { entrada ->
-                FormMateriaScreen(
-                    id = entrada.toRoute<FormMateria>().id,
-                    onTerminar = { nav.volverDesde(entrada) },
-                )
+                FormMateriaScreen(id = entrada.toRoute<FormMateria>().id, onTerminar = { nav.volverDesde(entrada) })
             }
             composable<FormClase> { entrada ->
                 val ruta = entrada.toRoute<FormClase>()
@@ -139,8 +184,39 @@ fun AgendaApp(viewModel: AppViewModel = viewModel(factory = AppViewModel.Factory
                     id = entrada.toRoute<DetalleClase>().id,
                     onAtras = { nav.volverDesde(entrada) },
                     onEditar = { nav.navigate(FormClase(id = it)) },
+                    onAbrirActividad = { nav.navigate(DetalleActividad(it)) },
                 )
             }
+            composable<FormActividad> { entrada ->
+                val ruta = entrada.toRoute<FormActividad>()
+                FormActividadScreen(
+                    id = ruta.id,
+                    fecha = ruta.fecha?.let(LocalDate::parse),
+                    onTerminar = { nav.volverDesde(entrada) },
+                )
+            }
+            composable<DetalleActividad> { entrada ->
+                DetalleActividadScreen(
+                    id = entrada.toRoute<DetalleActividad>().id,
+                    onAtras = { nav.volverDesde(entrada) },
+                    onEditar = { nav.navigate(FormActividad(id = it)) },
+                )
+            }
+            composable<AjustesAvisos> { entrada -> AjustesAvisosScreen(onAtras = { nav.volverDesde(entrada) }) }
+            composable<GuiaMiui> { entrada -> GuiaMiuiScreen(onTerminar = { nav.volverDesde(entrada) }) }
+        }
+    }
+}
+
+/** En Android 13 o superior se pide el permiso de notificaciones (CU-19 1a). En Android 12 no existe. */
+@Composable
+private fun PedirPermisoNotificaciones() {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+    val context = LocalContext.current
+    val lanzador = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
+    LaunchedEffect(Unit) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            lanzador.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
 }
