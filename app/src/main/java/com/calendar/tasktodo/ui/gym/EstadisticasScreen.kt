@@ -53,7 +53,14 @@ import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.layer.point
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLine
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
+import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
+import com.patrykandpatrick.vico.compose.common.fill
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianLayerRangeProvider
+import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
+import com.patrykandpatrick.vico.core.common.shape.CorneredShape
 import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
@@ -70,6 +77,8 @@ import kotlinx.coroutines.flow.stateIn
 import java.time.Clock
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import kotlin.math.ceil
+import kotlin.math.floor
 
 data class EstadisticasUiState(
     val periodo: Periodo = Periodo.MES,
@@ -280,13 +289,35 @@ private fun GraficaBarras(valores: List<Number>, etiquetas: List<String>) {
     )
 }
 
+/** Margen vertical para que una variación de 1 kg no se vea plana y un solo valor quede centrado. */
+fun rangoVertical(valores: List<Double>): Pair<Double, Double> {
+    val min = valores.min()
+    val max = valores.max()
+    val margen = maxOf((max - min) * 0.2, 1.0)
+    return floor(min - margen).coerceAtLeast(0.0) to ceil(max + margen)
+}
+
 @Composable
 private fun GraficaLinea(valores: List<Number>, etiquetas: List<String>) {
     val modelo = remember { CartesianChartModelProducer() }
     LaunchedEffect(valores) { if (valores.isNotEmpty()) modelo.runTransaction { lineSeries { series(valores) } } }
+    val color = MaterialTheme.colorScheme.primary
+    // Un punto en cada registro: con uno solo, la línea no se dibuja y la gráfica parecía vacía
+    val linea = LineCartesianLayer.rememberLine(
+        fill = LineCartesianLayer.LineFill.single(fill(color)),
+        pointProvider = LineCartesianLayer.PointProvider.single(
+            LineCartesianLayer.point(rememberShapeComponent(fill(color), CorneredShape.Pill), 8.dp),
+        ),
+    )
+    val rango = remember(valores) {
+        valores.takeIf { it.isNotEmpty() }?.let { v ->
+            val (min, max) = rangoVertical(v.map { it.toDouble() })
+            CartesianLayerRangeProvider.fixed(minY = min, maxY = max)
+        } ?: CartesianLayerRangeProvider.auto()
+    }
     CartesianChartHost(
         rememberCartesianChart(
-            rememberLineCartesianLayer(),
+            rememberLineCartesianLayer(lineProvider = LineCartesianLayer.LineProvider.series(linea), rangeProvider = rango),
             startAxis = VerticalAxis.rememberStart(),
             bottomAxis = HorizontalAxis.rememberBottom(valueFormatter = remember(etiquetas) { formateador(etiquetas) }),
         ),

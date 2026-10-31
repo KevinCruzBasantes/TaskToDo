@@ -122,4 +122,12 @@ class EstadisticasTest {
         assertTrue(datos.pesos.isEmpty())
         assertTrue(datos.fuerza.isEmpty())
     }
+
+    @Test
+    fun `el eje vertical se ajusta a los datos para que un solo punto o 1 kg de cambio se vean`() {
+        assertEquals(64.0 to 66.0, com.calendar.tasktodo.ui.gym.rangoVertical(listOf(65.0)))
+        assertEquals(63.0 to 67.0, com.calendar.tasktodo.ui.gym.rangoVertical(listOf(64.0, 65.4)))
+        assertEquals(72.0 to 128.0, com.calendar.tasktodo.ui.gym.rangoVertical(listOf(80.0, 120.0)))
+        assertEquals(0.0 to 1.0, com.calendar.tasktodo.ui.gym.rangoVertical(listOf(0.0)))
+    }
 }

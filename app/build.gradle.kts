@@ -30,8 +30,8 @@ android {
         applicationId = "com.calendar.tasktodo"
         minSdk = 26
         targetSdk = 37
-        versionCode = 8
-        versionName = "7.0"
+        versionCode = 9
+        versionName = "8.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders["appLabel"] = "TaskToDo"

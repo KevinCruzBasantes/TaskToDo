@@ -314,7 +314,7 @@ Estas versiones ya están en el proyecto:
 |---|---|
 | Android Gradle Plugin | 9.5.0, con soporte de Kotlin integrado |
 | Gradle | 9.6.0 |
-| Kotlin | 2.2.10 |
+| Kotlin | 2.4.21 (desde el 31 de octubre de 2026; antes 2.2.10) |
 | `compileSdk` y `targetSdk` | 37 |
 | `minSdk` | 26 |
 | Compose BOM | 2026.02.01 |
@@ -331,18 +331,18 @@ Las versiones exactas se fijan en `gradle/libs.versions.toml` al empezar el incr
 | Room (`room-runtime`, `room-ktx`, `room-compiler` con KSP, plugin `androidx.room`) | Base de datos, `Flow`, migraciones y esquema exportado en `app/schemas/`. | 1 | 2.8.5 |
 | KSP | Procesador de anotaciones de Room. | 1 | 2.3.13 |
 | Navigation Compose | Navegación con rutas tipadas. | 1 | 2.10.2 |
-| kotlinx.serialization (plugin y `json`) | Rutas de navegación y JSON del respaldo. | 1 | 1.9.0 (compatible con Kotlin 2.2) |
+| kotlinx.serialization (plugin y `json`) | Rutas de navegación y JSON del respaldo. | 1 | 1.11.0 (desde Kotlin 2.4; antes 1.9.0) |
 | Lifecycle (`viewmodel-compose`, `runtime-compose`) | ViewModels en Compose y `collectAsStateWithLifecycle`. | 1 | 2.11.0 |
 | Material Icons Core | Íconos de la barra y los botones. | 1 | Del BOM de Compose |
 | DataStore Preferences | Ajustes. El incremento 1 no tiene ajustes que guardar. | 2 | 1.2.1 |
 | WorkManager (`work-runtime-ktx`) | Respaldo automático. El mantenimiento diario quedó como alarma (§4.2). | 3 | 2.11.2 |
 | DocumentFile (`documentfile`) | Crear, listar y borrar archivos en la carpeta de respaldos. | 3 | 1.1.0 |
 | Reorderable (`sh.calvin.reorderable`) | Arrastrar los bloques de ejercicios, en la rutina y durante la sesión (CU-13 2d, CU-16 9b). | 5 | 3.1.0 |
-| Vico (`compose-m3`) | Gráficas de estadísticas: barras de minutos y líneas de peso, IMC y fuerza (CU-18). | 6 | 2.2.1 (la 3.x está compilada con Kotlin 2.3 o 2.4, que Kotlin 2.2.10 no puede leer) |
+| Vico (`compose-m3`) | Gráficas de estadísticas: barras de minutos y líneas de peso, IMC y fuerza (CU-18). | 6 | 2.2.1 (se eligió cuando el proyecto usaba Kotlin 2.2.10, que no puede leer la 3.x; con Kotlin 2.4 ya se podría pasar a la 3.x, que cambia la API) |
 
 Pruebas: JUnit 4, `kotlinx-coroutines-test` 1.10.2, Turbine 1.2.1 (para probar `Flow`), `room-testing` (`MigrationTestHelper`), `work-testing` (incremento 3) y Compose UI Test.
 
-Kotlin se mantiene en 2.2.10, la versión con la que se creó el proyecto, aunque ya existe la 2.4. Subirla es un cambio aparte, que conviene hacer entre incrementos. El detalle va en el [plan de pruebas](06-plan-de-pruebas.md).
+Kotlin pasó de 2.2.10, la versión con la que se creó el proyecto, a 2.4.21 el 31 de octubre de 2026, después de cerrar los 6 incrementos. Se eligió la última estable con más de dos semanas publicada. Con ella subieron sus plugins de Compose y de serialización, y `kotlinx.serialization` pasó a 1.11.0 (la 1.12.0 tenía menos de dos semanas). KSP 2.3.13 no depende de la versión de Kotlin y no cambió. El cambio se verificó con todas las pruebas: unitarias, instrumentadas en el Xiaomi y un recorrido de las pantallas de la app dev.
 
 ### 5.3 Firma, versiones e instalación
 
