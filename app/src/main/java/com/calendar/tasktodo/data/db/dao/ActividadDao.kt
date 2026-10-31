@@ -66,6 +66,15 @@ interface ActividadDao {
     @Query("UPDATE actividad SET fecha = :fecha WHERE id = :id")
     suspend fun cambiarFecha(id: Long, fecha: LocalDate)
 
+    @Query("SELECT * FROM actividad ORDER BY id")
+    suspend fun todas(): List<Actividad>
+
+    @Insert
+    suspend fun insertarTodas(actividades: List<Actividad>)
+
+    @Query("DELETE FROM actividad")
+    suspend fun eliminarTodas()
+
     @Insert
     suspend fun insertar(actividad: Actividad): Long
 

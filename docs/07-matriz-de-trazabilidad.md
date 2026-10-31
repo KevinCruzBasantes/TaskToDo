@@ -29,7 +29,7 @@ La matriz conecta cada requerimiento con su caso de uso, los datos que usa, las 
 | RF-01 | Guiar el registro inicial sin materias | CU-01 | `materia` | Bienvenida | CP-1.01 | 1 | 2026-10-31 · 1.1 |
 | RF-02 | Registrar materia con nombre y color | CU-02 | `materia` | Materias, Formulario de materia | CP-1.03 | 1 | 2026-10-31 · 1.1 |
 | RF-03 | Editar y eliminar materia | CU-02 | `materia`, `clase`, `actividad` | Materias, Formulario de materia | CP-1.04 | 1 | 2026-10-31 · 1.1 |
-| RF-04 | Eliminar todas las materias | CU-03 | `materia`, `clase`, `actividad` | Materias | CP-1.05, CP-3.14 | 1 y 3 | Parcial: 2026-10-31 · 1.1 (falta el respaldo previo, inc. 3) |
+| RF-04 | Eliminar todas las materias | CU-03 | `materia`, `clase`, `actividad` | Materias | CP-1.05, CP-3.14 | 1 y 3 | 2026-10-31 · 3.0 |
 | RF-05 | Registrar clase | CU-04 | `clase` | Formulario de clase | CP-1.06 | 1 | 2026-10-31 · 1.1 |
 | RF-06 | Consultar horario semanal | CU-05 | `clase`, `materia` | Horario | CP-1.09 | 1 | 2026-10-31 · 1.1 |
 | RF-07 | Editar y eliminar clase | CU-04 | `clase` | Formulario de clase, Detalle de clase | CP-1.14 | 1 | 2026-10-31 · 1.1 |
@@ -99,10 +99,10 @@ La matriz conecta cada requerimiento con su caso de uso, los datos que usa, las 
 
 | RF | Resumen | CU | Datos | Pantallas | Pruebas | Inc. | Verificado |
 |---|---|---|---|---|---|---|---|
-| RF-44 | Respaldar en la carpeta, y copia en otra ubicación | CU-21 | Todas las tablas, Ajustes, Archivo | Respaldo | CP-3.04, CP-3.05, CP-3.17 | 3 | — |
-| RF-45 | Restaurar desde la lista de la carpeta u otra ubicación | CU-22 | Todas las tablas, Ajustes, Archivo | Respaldo, Bienvenida | CP-3.06 a CP-3.10 | 3 | — |
-| RF-46 | Respaldo automático, últimos 5 | CU-23, CU-24 | Todas las tablas, Ajustes, Archivo | Respaldo | CP-3.11, CP-3.13 | 3 | — |
-| RF-47 | Registrar la carpeta, último respaldo y advertencia | CU-23 | Ajustes | Respaldo, Ajustes | CP-3.03, CP-3.12, CP-3.15, CP-3.16 | 3 | — |
+| RF-44 | Respaldar en la carpeta, y copia en otra ubicación | CU-21 | Todas las tablas, Ajustes, Archivo | Respaldo | CP-3.04, CP-3.05, CP-3.17 | 3 | 2026-10-31 · 3.0 |
+| RF-45 | Restaurar desde la lista de la carpeta u otra ubicación | CU-22 | Todas las tablas, Ajustes, Archivo | Respaldo, Bienvenida | CP-3.06 a CP-3.10 | 3 | 2026-10-31 · 3.0 |
+| RF-46 | Respaldo automático, últimos 5 | CU-23, CU-24 | Todas las tablas, Ajustes, Archivo | Respaldo | CP-3.11, CP-3.13 | 3 | 2026-10-31 · 3.0 (automático cubierto por pruebas unitarias) |
+| RF-47 | Registrar la carpeta, último respaldo y advertencia | CU-23 | Ajustes | Respaldo, Ajustes | CP-3.03, CP-3.12, CP-3.15, CP-3.16 | 3 | 2026-10-31 · 3.0 |
 
 ---
 
@@ -115,9 +115,9 @@ Los RNF valen para toda la app, así que se verifican en cada incremento desde e
 | RNF-01 · Plataforma | Android 8.0+, Kotlin y Compose; probada en Android 12 con MIUI 13 | [Arquitectura §5.1](03-arquitectura.md#51-base-del-proyecto), §4.6 | CP-1.13 | 1 | 2026-10-31 · 1.1 |
 | RNF-02 · Alcance | Un usuario, sin cuentas ni servidor | Arquitectura §1, §4.5 (sin permiso de internet) | Criterio de calidad "Sin cuentas ni red" | 1 | — |
 | RNF-03 · Almacenamiento | Room local, funciona sin internet | [Modelo de datos](02-modelo-de-datos.md) | Criterio de calidad "Sin internet" | 1 | — |
-| RNF-04 · Persistencia | No perder datos; instalar encima con la misma firma | [Modelo de datos §5](02-modelo-de-datos.md#5-versionado-y-migraciones), [arquitectura §5.3](03-arquitectura.md#53-firma-versiones-e-instalación) | CP-1.12, CP-1.15 a CP-1.19, CP-2.12, CP-3.18, CP-5.32, CP-6.11 | 1 | Parcial: 2026-10-31 · 2.0 (firma, instalación encima y migración 1→2 con datos reales) |
-| RNF-05 · Respaldo | Fuera de la app, en una carpeta registrada | Arquitectura §4.4 | CP-3.15, CP-3.18 | 3 | — |
-| RNF-06 · Respaldo | JSON con versiones y fecha | [Diagramas §2.2](05-diagramas-de-comportamiento.md#22-respaldar-ahora) | CP-3.01, CP-3.02, CP-3.10 | 3 | — |
+| RNF-04 · Persistencia | No perder datos; instalar encima con la misma firma | [Modelo de datos §5](02-modelo-de-datos.md#5-versionado-y-migraciones), [arquitectura §5.3](03-arquitectura.md#53-firma-versiones-e-instalación) | CP-1.12, CP-1.15 a CP-1.19, CP-2.12, CP-3.18, CP-5.32, CP-6.11 | 1 | Parcial: 2026-10-31 · 3.0 (firma, instalación encima, migración 1→2 y reinstalación con restauración) |
+| RNF-05 · Respaldo | Fuera de la app, en una carpeta registrada | Arquitectura §4.4 | CP-3.15, CP-3.18 | 3 | 2026-10-31 · 3.0 (reinstalación CP-3.18 hecha por el usuario) |
+| RNF-06 · Respaldo | JSON con versiones y fecha | [Diagramas §2.2](05-diagramas-de-comportamiento.md#22-respaldar-ahora) | CP-3.01, CP-3.02, CP-3.10 | 3 | 2026-10-31 · 3.0 |
 | RNF-07 · Confiabilidad | Cronómetro desde la hora guardada y servicio en primer plano | Arquitectura §4.3, [diagramas §1.3](05-diagramas-de-comportamiento.md#13-recuperar-una-sesión-después-de-un-cierre) | CP-5.34, CP-5.35 | 5 | — |
 | RNF-08 · Usabilidad | Un toque para marcar y para confirmar una serie | [Diseño de interfaz §1](04-diseno-de-interfaz.md#1-principios-de-diseño) | CP-2.06, CP-5.22 | 2 | 2026-10-31 · 2.0 |
 | RNF-09 · Mantenibilidad | MVVM por capas | [Arquitectura §2](03-arquitectura.md#2-capas-mvvm) | Criterio de calidad "Capas MVVM" | 1 | — |

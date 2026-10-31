@@ -64,15 +64,32 @@ class DiaYBienvenidaUiTest {
         val viewModel = BienvenidaViewModel(repositorio)
         compose.setContent {
             TaskToDoTheme {
-                BienvenidaScreen({}, {}, {}, {}, viewModel = viewModel)
+                BienvenidaScreen({}, {}, {}, {}, onRestaurar = {}, viewModel = viewModel)
             }
         }
+        compose.onNodeWithText("Empezar desde cero").performClick()
         compose.onNodeWithText("Listo").assertIsNotEnabled()
 
         runBlocking { db.materiaDao().insertar(Materia(nombre = "Cálculo", color = 1)) }
 
         esperarTexto("Cálculo")
         compose.onNodeWithText("Listo").assertIsEnabled()
+    }
+
+    @Test
+    fun laBienvenidaPreguntaPrimeroSiEmpezarDeCeroORestaurar_CU_01() {
+        var restaurar = 0
+        val viewModel = BienvenidaViewModel(repositorio)
+        compose.setContent {
+            TaskToDoTheme {
+                BienvenidaScreen({}, {}, {}, {}, onRestaurar = { restaurar++ }, viewModel = viewModel)
+            }
+        }
+        compose.onNodeWithText("¿Es la primera vez que usas la app?").assertExists()
+        compose.onNodeWithText("Listo").assertDoesNotExist()
+
+        compose.onNodeWithText("Restaurar mis datos").performClick()
+        compose.waitUntil(5_000) { restaurar == 1 }
     }
 
     @Test

@@ -125,11 +125,35 @@ Los wireframes muestran la distribución y el contenido, no el estilo final. `�
 
 ### 3.1 Bienvenida (CU-01)
 
+Primero, la decisión que importa: empezar de cero o recuperar los datos.
+
 ```text
 ┌──────────────────────────────────┐
 │                                  │
-│         Agenda Personal          │
+│  TaskToDo                        │
 │                                  │
+│  ¿Es la primera vez que usas     │
+│  la app?                         │
+│                                  │
+│  ┌────────────────────────────┐  │
+│  │ Empezar desde cero         │  │
+│  │ Agrega tus materias y tu   │  │
+│  │ horario.                   │  │
+│  └────────────────────────────┘  │
+│  ┌────────────────────────────┐  │
+│  │ Restaurar mis datos        │  │
+│  │ Reinstalé la app: elijo la │  │
+│  │ carpeta de mis respaldos.  │  │
+│  └────────────────────────────┘  │
+└──────────────────────────────────┘
+```
+
+- **"Restaurar mis datos"** abre la pantalla de Respaldo y, sin más toques, el selector de carpetas. Al elegir la carpeta aparece la lista de respaldos. Al restaurar, la app va a Hoy (CU-01 2a).
+- **"Empezar desde cero"** lleva a la guía del horario:
+
+```text
+┌──────────────────────────────────┐
+│  TaskToDo                        │
 │  Empecemos con tu horario.       │
 │  Agrega tus materias y en qué    │
 │  días y horas tienes clase.      │
@@ -141,15 +165,14 @@ Los wireframes muestran la distribución y el contenido, no el estilo final. `�
 │  │ + Agregar materia          │  │
 │  └────────────────────────────┘  │
 │                                  │
-│  ¿Reinstalaste la app?           │
-│  Restaurar un respaldo         › │
 │  Omitir              [ Listo ]   │
 └──────────────────────────────────┘
 ```
 
 - Al tocar una materia se abren sus clases para agregarlas (CU-04).
-- "Restaurar un respaldo" pide registrar la carpeta de respaldos y muestra sus archivos (CU-01 2a). Aparece desde el incremento 3.
-- "Listo" se activa con al menos una materia. En un Xiaomi, después muestra la guía de MIUI (CU-01 7a). La guía llega con los avisos, en el incremento 2.
+- "Listo" se activa con al menos una materia. En un Xiaomi, después muestra la guía de MIUI (CU-01 7a).
+- Si ya hay materias, la pregunta inicial no se muestra.
+- En una versión anterior, la restauración era un enlace al pie de esta pantalla ("¿Reinstalaste la app? Restaurar un respaldo"). En las pruebas del incremento 3 no se reconoció como botón, y se reemplazó por la pregunta inicial.
 
 ### 3.2 Hoy · módulo del día (CU-08, CU-09, CU-10)
 

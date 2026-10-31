@@ -29,6 +29,13 @@ interface MateriaDao {
     @Query("SELECT * FROM materia WHERE id = :id")
     suspend fun obtener(id: Long): Materia?
 
+    @Query("SELECT * FROM materia ORDER BY id")
+    suspend fun todas(): List<Materia>
+
+    /** Para restaurar un respaldo: conserva los ids del archivo. */
+    @Insert
+    suspend fun insertarTodas(materias: List<Materia>)
+
     @Insert
     suspend fun insertar(materia: Materia): Long
 

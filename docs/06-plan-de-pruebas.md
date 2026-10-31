@@ -84,7 +84,7 @@ flowchart TB
 3. En Ajustes → Aplicaciones → TaskToDo (dev) → Otros permisos, permitir **"Mostrar ventanas emergentes mientras se ejecuta en segundo plano"**.
 4. Ejecutar: `adb shell am instrument -w -r com.calendar.tasktodo.debug.test/androidx.test.runner.AndroidJUnitRunner`.
 
-Al reinstalar con `adb install -r` el permiso se conserva. Solo lo necesita la variante de desarrollo.
+Al reinstalar con `adb install -r` el permiso se conserva, pero **desinstalar "TaskToDo (dev)" lo borra** (pasó en la prueba de reinstalación del incremento 3): después hay que volver a darlo. Solo lo necesita la variante de desarrollo.
 
 **Cobertura.** Se mide con la cobertura integrada de AGP (`enableUnitTestCoverage = true` en el tipo `debug`). La meta es **80 % o más** en los paquetes `data.repositorio` y `ui.*` (ViewModels). No se pone meta en las pantallas Compose ni en `sistema`, que se cubren con pruebas de interfaz y manuales.
 

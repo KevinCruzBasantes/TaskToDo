@@ -28,6 +28,17 @@ data class AjustesAvisos(
     val prioridadAlarma: Boolean = true,
 )
 
+/** Cada cuánto se hace el respaldo automático (RF-46). */
+enum class Frecuencia(val dias: Long) { DIARIA(1), SEMANAL(7), MENSUAL(30) }
+
+data class AjustesRespaldo(
+    /** URI de la carpeta registrada; no viaja en el respaldo porque el permiso es de cada instalación. */
+    val carpeta: String? = null,
+    val ultimo: Instant? = null,
+    val automatico: Boolean = false,
+    val frecuencia: Frecuencia = Frecuencia.SEMANAL,
+)
+
 /** Ajustes en DataStore (modelo de datos §2.3). */
 class AjustesRepository(private val datos: DataStore<Preferences>) {
 
@@ -44,6 +55,31 @@ class AjustesRepository(private val datos: DataStore<Preferences>) {
             horaResumen = p[HORA_RESUMEN]?.let(LocalTime::parse) ?: porDefecto.horaResumen,
             prioridadAlarma = p[PRIORIDAD_ALARMA] ?: porDefecto.prioridadAlarma,
         )
+    }
+
+    val respaldo: Flow<AjustesRespaldo> = datos.data.map { p ->
+        AjustesRespaldo(
+            carpeta = p[CARPETA_RESPALDOS],
+            ultimo = p[ULTIMO_RESPALDO]?.let(Instant::ofEpochMilli),
+            automatico = p[RESPALDO_AUTOMATICO] ?: false,
+            frecuencia = p[FRECUENCIA_RESPALDO]?.let { nombre -> Frecuencia.entries.firstOrNull { it.name == nombre } }
+                ?: Frecuencia.SEMANAL,
+        )
+    }
+
+    suspend fun guardarCarpeta(uri: String) {
+        datos.edit { it[CARPETA_RESPALDOS] = uri }
+    }
+
+    suspend fun guardarUltimoRespaldo(instante: Instant) {
+        datos.edit { it[ULTIMO_RESPALDO] = instante.toEpochMilli() }
+    }
+
+    suspend fun guardarAutomatico(activado: Boolean, frecuencia: Frecuencia) {
+        datos.edit {
+            it[RESPALDO_AUTOMATICO] = activado
+            it[FRECUENCIA_RESPALDO] = frecuencia.name
+        }
     }
 
     val guiaMiuiMostrada: Flow<Boolean> = datos.data.map { it[GUIA_MIUI_MOSTRADA] ?: false }
@@ -101,5 +137,9 @@ class AjustesRepository(private val datos: DataStore<Preferences>) {
         val PASOS_GUIA_HECHOS = stringSetPreferencesKey("pasos_guia_hechos")
         val CODIGOS_PROGRAMADOS = stringSetPreferencesKey("codigos_programados")
         val ULTIMA_COMPROBACION = longPreferencesKey("ultima_comprobacion")
+        val CARPETA_RESPALDOS = stringPreferencesKey("carpeta_respaldos")
+        val ULTIMO_RESPALDO = longPreferencesKey("ultimo_respaldo")
+        val RESPALDO_AUTOMATICO = booleanPreferencesKey("respaldo_automatico")
+        val FRECUENCIA_RESPALDO = stringPreferencesKey("frecuencia_respaldo")
     }
 }

@@ -3,15 +3,19 @@ package com.calendar.tasktodo.di
 import android.content.Context
 import androidx.datastore.preferences.preferencesDataStore
 import com.calendar.tasktodo.data.ajustes.AjustesRepository
+import androidx.room.withTransaction
 import com.calendar.tasktodo.data.db.AgendaDatabase
 import com.calendar.tasktodo.data.repositorio.ActividadRepository
 import com.calendar.tasktodo.data.repositorio.HorarioRepository
+import com.calendar.tasktodo.data.respaldo.RespaldoRepository
 import com.calendar.tasktodo.sistema.avisos.NotificadorAndroid
 import com.calendar.tasktodo.sistema.avisos.ProgramadorAlarmas
 import com.calendar.tasktodo.sistema.avisos.ServicioAvisos
 import com.calendar.tasktodo.sistema.compatibilidad.EstadoSistema
 import com.calendar.tasktodo.sistema.compatibilidad.EstadoSistemaAndroid
 import com.calendar.tasktodo.sistema.compatibilidad.PendientesAlAbrir
+import com.calendar.tasktodo.sistema.respaldo.AlmacenSaf
+import com.calendar.tasktodo.sistema.respaldo.PlanificadorRespaldoWork
 import java.time.Clock
 
 private val Context.almacenAjustes by preferencesDataStore(name = "ajustes")
@@ -41,5 +45,18 @@ class AppContainer(context: Context) {
 
     val actividadRepository = ActividadRepository(baseDeDatos.actividadDao(), servicioAvisos)
 
-    val pendientesAlAbrir = PendientesAlAbrir(ajustesRepository, servicioAvisos, reloj)
+    val respaldoRepository = RespaldoRepository(
+        materias = baseDeDatos.materiaDao(),
+        clases = baseDeDatos.claseDao(),
+        actividades = baseDeDatos.actividadDao(),
+        ajustes = ajustesRepository,
+        almacen = AlmacenSaf(context),
+        planificador = PlanificadorRespaldoWork(context),
+        transaccion = { bloque -> baseDeDatos.withTransaction { bloque() } },
+        reloj = reloj,
+        versionApp = context.packageManager.getPackageInfo(context.packageName, 0).versionName.orEmpty(),
+        observador = servicioAvisos,
+    )
+
+    val pendientesAlAbrir = PendientesAlAbrir(ajustesRepository, servicioAvisos, reloj, respaldoRepository)
 }

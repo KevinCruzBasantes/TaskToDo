@@ -20,10 +20,14 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -40,9 +44,17 @@ fun BienvenidaScreen(
     onEditarMateria: (Long) -> Unit,
     onAgregarClases: (Long) -> Unit,
     onTerminar: () -> Unit,
+    onRestaurar: () -> Unit,
     viewModel: BienvenidaViewModel = viewModel(factory = BienvenidaViewModel.Factory),
 ) {
     val materias by viewModel.materias.collectAsStateWithLifecycle()
+    var desdeCero by rememberSaveable { mutableStateOf(false) }
+
+    // Primero la decisión que importa: empezar de cero o recuperar los datos (CU-01 2a)
+    if (materias.isEmpty() && !desdeCero) {
+        PreguntaInicial(onDesdeCero = { desdeCero = true }, onRestaurar = onRestaurar)
+        return
+    }
 
     Pantalla(enBarra = false) { modifier ->
         Column(
@@ -95,6 +107,36 @@ fun BienvenidaScreen(
                 TextButton(onClick = onTerminar) { Text("Omitir") }
                 Button(onClick = onTerminar, enabled = materias.isNotEmpty()) { Text("Listo") }
             }
+        }
+    }
+}
+
+@Composable
+private fun PreguntaInicial(onDesdeCero: () -> Unit, onRestaurar: () -> Unit) {
+    Pantalla(enBarra = false) { modifier ->
+        Column(
+            modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Text("TaskToDo", style = MaterialTheme.typography.headlineMedium)
+            Spacer(Modifier.height(12.dp))
+            Text("¿Es la primera vez que usas la app?", style = MaterialTheme.typography.titleLarge)
+            Spacer(Modifier.height(32.dp))
+            Opcion("Empezar desde cero", "Agrega tus materias y tu horario.", onDesdeCero)
+            Spacer(Modifier.height(16.dp))
+            Opcion("Restaurar mis datos", "Reinstalé la app: elijo la carpeta de mis respaldos.", onRestaurar)
+        }
+    }
+}
+
+@Composable
+private fun Opcion(titulo: String, detalle: String, onClick: () -> Unit) {
+    OutlinedCard(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(20.dp)) {
+            Text(titulo, style = MaterialTheme.typography.titleMedium)
+            Text(detalle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }

@@ -43,3 +43,7 @@ data object AjustesAvisos
 
 @Serializable
 data object GuiaMiui
+
+/** Desde la bienvenida, al restaurar se va directo al día (CU-01 2a). */
+@Serializable
+data class Respaldo(val desdeBienvenida: Boolean = false)

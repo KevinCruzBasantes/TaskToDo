@@ -8,6 +8,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -18,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -31,6 +34,7 @@ import com.calendar.tasktodo.ui.componentes.DialogoConfirmar
 import com.calendar.tasktodo.ui.componentes.EstadoVacio
 import com.calendar.tasktodo.ui.componentes.Pantalla
 import com.calendar.tasktodo.ui.componentes.PuntoColor
+import com.calendar.tasktodo.ui.componentes.rememberSelectorCarpeta
 
 /** Lista de materias (CU-02) y "Eliminar todas las materias" (CU-03). */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,6 +47,13 @@ fun MateriasScreen(
 ) {
     val estado by viewModel.estado.collectAsStateWithLifecycle()
     var confirmando by rememberSaveable { mutableStateOf(false) }
+    val elegirCarpeta = rememberSelectorCarpeta(onElegida = viewModel::registrarCarpetaYSeguir)
+    LaunchedEffect(estado.pedirCarpeta) {
+        if (estado.pedirCarpeta) {
+            viewModel.carpetaPedida()
+            elegirCarpeta()
+        }
+    }
 
     Pantalla(
         enBarra = false,
@@ -92,16 +103,47 @@ fun MateriasScreen(
     }
 
     if (confirmando) {
-        DialogoConfirmar(
-            titulo = "¿Eliminar todas las materias?",
-            texto = "Se borrarán ${estado.materias.size} materias y ${textoClases(estado.totalClases)}. " +
-                "Tus actividades se conservarán sin materia.",
-            confirmar = "Eliminar todo",
-            onConfirmar = {
-                viewModel.eliminarTodas()
-                confirmando = false
+        // Antes de borrar se ofrece un respaldo (CU-03 2)
+        AlertDialog(
+            onDismissRequest = { confirmando = false },
+            title = { Text("¿Eliminar todas las materias?") },
+            text = {
+                Column {
+                    Text(
+                        "Se borrarán ${estado.materias.size} materias y ${textoClases(estado.totalClases)}. " +
+                            "Tus actividades se conservarán sin materia.",
+                    )
+                    TextButton(onClick = {
+                        confirmando = false
+                        viewModel.respaldarYEliminar()
+                    }, modifier = Modifier.padding(top = 8.dp)) { Text("Respaldar y eliminar") }
+                    TextButton(onClick = {
+                        confirmando = false
+                        viewModel.eliminarTodas()
+                    }) { Text("Eliminar sin respaldo", color = MaterialTheme.colorScheme.error) }
+                }
             },
-            onCancelar = { confirmando = false },
+            confirmButton = {},
+            dismissButton = { TextButton(onClick = { confirmando = false }) { Text("Cancelar") } },
+        )
+    }
+    if (estado.respaldoFallido) {
+        DialogoConfirmar(
+            titulo = "No se pudo crear el respaldo",
+            texto = "¿Eliminar todas las materias de todas formas?",
+            confirmar = "Eliminar sin respaldo",
+            onConfirmar = {
+                viewModel.cerrarFallo()
+                viewModel.eliminarTodas()
+            },
+            onCancelar = viewModel::cerrarFallo,
+        )
+    }
+    estado.mensaje?.let { mensaje ->
+        AlertDialog(
+            onDismissRequest = viewModel::mensajeMostrado,
+            text = { Text(mensaje) },
+            confirmButton = { TextButton(onClick = viewModel::mensajeMostrado) { Text("Aceptar") } },
         )
     }
 }

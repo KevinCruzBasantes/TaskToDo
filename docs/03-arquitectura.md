@@ -334,8 +334,9 @@ Las versiones exactas se fijan en `gradle/libs.versions.toml` al empezar el incr
 | kotlinx.serialization (plugin y `json`) | Rutas de navegación y JSON del respaldo. | 1 | 1.9.0 (compatible con Kotlin 2.2) |
 | Lifecycle (`viewmodel-compose`, `runtime-compose`) | ViewModels en Compose y `collectAsStateWithLifecycle`. | 1 | 2.11.0 |
 | Material Icons Core | Íconos de la barra y los botones. | 1 | Del BOM de Compose |
-| DataStore Preferences | Ajustes. El incremento 1 no tiene ajustes que guardar. | 2 | Por fijar |
-| WorkManager (`work-runtime-ktx`) | Respaldo automático y mantenimiento diario. | 3 | Por fijar |
+| DataStore Preferences | Ajustes. El incremento 1 no tiene ajustes que guardar. | 2 | 1.2.1 |
+| WorkManager (`work-runtime-ktx`) | Respaldo automático. El mantenimiento diario quedó como alarma (§4.2). | 3 | 2.11.2 |
+| DocumentFile (`documentfile`) | Crear, listar y borrar archivos en la carpeta de respaldos. | 3 | 1.1.0 |
 | Reorderable (`sh.calvin.reorderable`) | Arrastrar para reordenar ejercicios (CU-13 2d). | 5 | Por fijar |
 | Vico (`compose-m3`) | Gráficas de estadísticas (CU-18). | 6 | Por fijar |
 

@@ -11,6 +11,7 @@ import android.os.PowerManager
 import android.provider.Settings
 import androidx.core.app.NotificationManagerCompat
 import com.calendar.tasktodo.data.ajustes.AjustesRepository
+import com.calendar.tasktodo.data.respaldo.RespaldoRepository
 import com.calendar.tasktodo.sistema.avisos.ServicioAvisos
 import java.time.Clock
 import java.time.Duration
@@ -99,12 +100,14 @@ class PendientesAlAbrir(
     private val ajustes: AjustesRepository,
     private val avisos: ServicioAvisos,
     private val reloj: Clock,
+    private val respaldo: RespaldoRepository? = null,
 ) {
     suspend fun ejecutar() {
         val ahora = Instant.now(reloj)
         val ultima = ajustes.ultimaComprobacion()
         if (ultima != null && Duration.between(ultima, ahora) < INTERVALO) return
         avisos.reprogramarTodo()
+        respaldo?.ponerAlDia()
         ajustes.guardarUltimaComprobacion(ahora)
     }
 

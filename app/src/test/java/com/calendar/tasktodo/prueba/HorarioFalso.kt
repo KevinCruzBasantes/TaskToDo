@@ -74,6 +74,13 @@ class HorarioFalso {
 
         override suspend fun obtener(id: Long) = materias.value.firstOrNull { it.id == id }
 
+        override suspend fun todas() = materias.value.sortedBy { it.id }
+
+        override suspend fun insertarTodas(materias: List<Materia>) {
+            require(materias.none { m -> this@HorarioFalso.materias.value.any { it.id == m.id } }) { "UNIQUE constraint failed: materia.id" }
+            this@HorarioFalso.materias.update { it + materias }
+        }
+
         override suspend fun insertar(materia: Materia): Long {
             val id = siguienteId++
             materias.update { it + materia.copy(id = id) }
@@ -113,6 +120,18 @@ class HorarioFalso {
                 .mapNotNull(::conMateria)
 
         override suspend fun contarDeMateria(materiaId: Long) = clases.value.count { it.materiaId == materiaId }
+
+        override suspend fun todas() = clases.value.sortedBy { it.id }
+
+        override suspend fun insertarTodas(clases: List<Clase>) {
+            // Como la clave foránea de Room: la materia debe existir
+            require(clases.all { c -> materias.value.any { it.id == c.materiaId } }) { "FOREIGN KEY constraint failed" }
+            this@HorarioFalso.clases.update { it + clases }
+        }
+
+        override suspend fun eliminarTodas() {
+            clases.value = emptyList()
+        }
 
         override suspend fun insertar(clase: Clase): Long {
             val id = siguienteId++
@@ -157,6 +176,16 @@ class HorarioFalso {
 
         override suspend fun cambiarFecha(id: Long, fecha: LocalDate) =
             actividades.update { lista -> lista.map { if (it.id == id) it.copy(fecha = fecha) else it } }
+
+        override suspend fun todas() = actividades.value.sortedBy { it.id }
+
+        override suspend fun insertarTodas(actividades: List<Actividad>) {
+            this@HorarioFalso.actividades.update { it + actividades }
+        }
+
+        override suspend fun eliminarTodas() {
+            actividades.value = emptyList()
+        }
 
         override suspend fun insertar(actividad: Actividad): Long {
             val id = siguienteId++

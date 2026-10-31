@@ -17,11 +17,12 @@ import com.calendar.tasktodo.data.db.entidad.ClaseConMateria
 import com.calendar.tasktodo.ui.ESPANOL
 import java.time.format.DateTimeFormatter
 
-/** Canales de notificación (arquitectura §4.2). Los de gym y respaldo llegan con su incremento. */
+/** Canales de notificación (arquitectura §4.2). Los de gym llegan con su incremento. */
 object Canales {
     const val ACTIVIDADES = "actividades"
     const val CLASES = "clases"
     const val RESUMEN = "resumen"
+    const val RESPALDO = "respaldo"
 
     fun crear(context: Context) {
         val gestor = context.getSystemService(NotificationManager::class.java)
@@ -33,6 +34,8 @@ object Canales {
                     .apply { description = "Aviso antes de cada clase" },
                 NotificationChannel(RESUMEN, "Resumen del día", NotificationManager.IMPORTANCE_DEFAULT)
                     .apply { description = "Lo que hay para hoy y las tareas atrasadas" },
+                NotificationChannel(RESPALDO, "Respaldo", NotificationManager.IMPORTANCE_LOW)
+                    .apply { description = "Respaldo automático fallido" },
             ),
         )
     }

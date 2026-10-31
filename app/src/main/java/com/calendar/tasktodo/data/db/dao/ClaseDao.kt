@@ -45,6 +45,15 @@ interface ClaseDao {
     @Query("SELECT COUNT(*) FROM clase WHERE materia_id = :materiaId")
     suspend fun contarDeMateria(materiaId: Long): Int
 
+    @Query("SELECT * FROM clase ORDER BY id")
+    suspend fun todas(): List<Clase>
+
+    @Insert
+    suspend fun insertarTodas(clases: List<Clase>)
+
+    @Query("DELETE FROM clase")
+    suspend fun eliminarTodas()
+
     @Insert
     suspend fun insertar(clase: Clase): Long
 

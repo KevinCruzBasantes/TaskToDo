@@ -41,6 +41,7 @@ import com.calendar.tasktodo.ui.actividades.FormActividadScreen
 import com.calendar.tasktodo.ui.ajustes.AjustesAvisosScreen
 import com.calendar.tasktodo.ui.ajustes.AjustesScreen
 import com.calendar.tasktodo.ui.ajustes.GuiaMiuiScreen
+import com.calendar.tasktodo.ui.ajustes.RespaldoScreen
 import com.calendar.tasktodo.ui.dia.DiaScreen
 import com.calendar.tasktodo.ui.horario.DetalleClaseScreen
 import com.calendar.tasktodo.ui.horario.FormClaseScreen
@@ -129,6 +130,7 @@ fun AgendaApp(
                         nav.navigate(Dia()) { popUpTo<Bienvenida> { inclusive = true } }
                         if (mostrarGuiaMiui) nav.navigate(GuiaMiui)
                     },
+                    onRestaurar = { nav.navigate(Respaldo(desdeBienvenida = true)) },
                 )
             }
             composable<Dia> { entrada ->
@@ -158,6 +160,7 @@ fun AgendaApp(
                     onMaterias = { nav.navigate(Materias) },
                     onAvisos = { nav.navigate(AjustesAvisos) },
                     onGuiaMiui = { nav.navigate(GuiaMiui) },
+                    onRespaldo = { nav.navigate(Respaldo()) },
                 )
             }
             composable<Materias> { entrada ->
@@ -204,6 +207,16 @@ fun AgendaApp(
             }
             composable<AjustesAvisos> { entrada -> AjustesAvisosScreen(onAtras = { nav.volverDesde(entrada) }) }
             composable<GuiaMiui> { entrada -> GuiaMiuiScreen(onTerminar = { nav.volverDesde(entrada) }) }
+            composable<Respaldo> { entrada ->
+                val desdeBienvenida = entrada.toRoute<Respaldo>().desdeBienvenida
+                RespaldoScreen(
+                    iniciarRestauracion = desdeBienvenida,
+                    onAtras = { nav.volverDesde(entrada) },
+                    onRestaurado = {
+                        if (desdeBienvenida) nav.navigate(Dia()) { popUpTo<Bienvenida> { inclusive = true } }
+                    },
+                )
+            }
         }
     }
 }
