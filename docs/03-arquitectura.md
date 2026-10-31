@@ -391,7 +391,7 @@ El nombre visible sale de `manifestPlaceholders["appLabel"]` en cada tipo de com
 
 **Si Android Studio o el celular ofrecen desinstalar,** porque detectan una firma distinta (`INSTALL_FAILED_UPDATE_INCOMPATIBLE`), **no se acepta**. Significa que el APK no se firmó con `agenda-release.jks`. Se corrige la firma y se vuelve a instalar.
 
-**La compilación `release` tiene R8 activado** (`optimization { enable = true }` en `build.gradle.kts`). Room y kotlinx.serialization necesitan reglas para que R8 no borre sus clases, y la prueba de actualización se hace siempre con el APK `release`, no con el de depuración.
+**La compilación `release` no usa R8** (`optimization { enable = false }` en `build.gradle.kts`). En el incremento 1, R8 movió clases internas de Kotlin (`CollectionsKt__IteratorsKt`) a otro paquete y la app real se cerraba al abrir con `IllegalAccessError`, un fallo que no aparece en la variante de desarrollo ni en las pruebas automáticas. Sin R8, `release` ejecuta el mismo código que las pruebas; el APK pasa de 1,9 MB a 8,6 MB, lo que no importa en una app que no se publica. Para volver a activarlo haría falta la prueba de humo `release` (CP-1.19) en cada incremento.
 
 ---
 

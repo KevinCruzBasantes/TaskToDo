@@ -30,8 +30,8 @@ android {
         applicationId = "com.calendar.tasktodo"
         minSdk = 26
         targetSdk = 37
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders["appLabel"] = "TaskToDo"
@@ -59,9 +59,11 @@ android {
         release {
             // Sin la clave, el APK sale sin firmar y Android no lo instala encima de la app real
             signingConfig = signingConfigs.findByName("release")
+            // R8 desactivado: al reubicar clases internas de Kotlin rompía la app solo en release
+            // (IllegalAccessError al abrir). Así release ejecuta el mismo código que pasa las pruebas.
+            // Ver docs/03-arquitectura.md §5.3.
             optimization {
-                enable = true
-                packageScope = setOf("androidx.**", "kotlin.**", "kotlinx.**")
+                enable = false
             }
         }
     }

@@ -26,14 +26,14 @@ La matriz conecta cada requerimiento con su caso de uso, los datos que usa, las 
 
 | RF | Resumen | CU | Datos | Pantallas | Pruebas | Inc. | Verificado |
 |---|---|---|---|---|---|---|---|
-| RF-01 | Guiar el registro inicial sin materias | CU-01 | `materia` | Bienvenida | CP-1.01 | 1 | — |
-| RF-02 | Registrar materia con nombre y color | CU-02 | `materia` | Materias, Formulario de materia | CP-1.03 | 1 | — |
-| RF-03 | Editar y eliminar materia | CU-02 | `materia`, `clase`, `actividad` | Materias, Formulario de materia | CP-1.04 | 1 | — |
-| RF-04 | Eliminar todas las materias | CU-03 | `materia`, `clase`, `actividad` | Materias | CP-1.05, CP-3.14 | 1 y 3 | — |
-| RF-05 | Registrar clase | CU-04 | `clase` | Formulario de clase | CP-1.06 | 1 | — |
-| RF-06 | Consultar horario semanal | CU-05 | `clase`, `materia` | Horario | CP-1.09 | 1 | — |
-| RF-07 | Editar y eliminar clase | CU-04 | `clase` | Formulario de clase, Detalle de clase | CP-1.14 | 1 | — |
-| RF-08 | Repetir clases cada semana | CU-04 | `clase` | Hoy, Semana, Horario | CP-1.08 | 1 | — |
+| RF-01 | Guiar el registro inicial sin materias | CU-01 | `materia` | Bienvenida | CP-1.01 | 1 | 2026-10-31 · 1.1 |
+| RF-02 | Registrar materia con nombre y color | CU-02 | `materia` | Materias, Formulario de materia | CP-1.03 | 1 | 2026-10-31 · 1.1 |
+| RF-03 | Editar y eliminar materia | CU-02 | `materia`, `clase`, `actividad` | Materias, Formulario de materia | CP-1.04 | 1 | 2026-10-31 · 1.1 |
+| RF-04 | Eliminar todas las materias | CU-03 | `materia`, `clase`, `actividad` | Materias | CP-1.05, CP-3.14 | 1 y 3 | Parcial: 2026-10-31 · 1.1 (falta el respaldo previo, inc. 3) |
+| RF-05 | Registrar clase | CU-04 | `clase` | Formulario de clase | CP-1.06 | 1 | 2026-10-31 · 1.1 |
+| RF-06 | Consultar horario semanal | CU-05 | `clase`, `materia` | Horario | CP-1.09 | 1 | 2026-10-31 · 1.1 |
+| RF-07 | Editar y eliminar clase | CU-04 | `clase` | Formulario de clase, Detalle de clase | CP-1.14 | 1 | 2026-10-31 · 1.1 |
+| RF-08 | Repetir clases cada semana | CU-04 | `clase` | Hoy, Semana, Horario | CP-1.08 | 1 | 2026-10-31 · 1.1 |
 
 ### 1.2 Actividades
 
@@ -52,9 +52,9 @@ La matriz conecta cada requerimiento con su caso de uso, los datos que usa, las 
 
 | RF | Resumen | CU | Datos | Pantallas | Pruebas | Inc. | Verificado |
 |---|---|---|---|---|---|---|---|
-| RF-17 | Clases y actividades del día por hora | CU-10 | `clase`, `actividad`, `materia` | Hoy | CP-1.11, CP-2.11 | 1 y 2 | — |
-| RF-18 | Abrir en el día actual | CU-10 | — | Hoy | CP-1.02 | 1 | — |
-| RF-19 | Cambiar de día | CU-10 | — | Hoy | CP-1.10 | 1 | — |
+| RF-17 | Clases y actividades del día por hora | CU-10 | `clase`, `actividad`, `materia` | Hoy | CP-1.11, CP-2.11 | 1 y 2 | Parcial: 2026-10-31 · 1.1 (clases; las actividades en el inc. 2) |
+| RF-18 | Abrir en el día actual | CU-10 | — | Hoy | CP-1.02 | 1 | 2026-10-31 · 1.1 |
+| RF-19 | Cambiar de día | CU-10 | — | Hoy | CP-1.10 | 1 | 2026-10-31 · 1.1 |
 | RF-20 | Marcar desde el módulo | CU-08 | `actividad` | Hoy | CP-2.06 | 2 | — |
 | RF-21 | Agregar con la fecha del día | CU-06 | `actividad` | Hoy, Formulario de actividad | CP-2.02 | 2 | — |
 | RF-22 | Abrir detalle, o rutina si es gym | CU-10 | `actividad` | Hoy, Detalle de actividad, Sesión de gym | CP-2.13, CP-5.37 | 2 y 5 | — |
@@ -112,10 +112,10 @@ Los RNF valen para toda la app, así que se verifican en cada incremento desde e
 
 | RNF | Resumen | Dónde se resuelve | Pruebas | Desde inc. | Verificado |
 |---|---|---|---|---|---|
-| RNF-01 · Plataforma | Android 8.0+, Kotlin y Compose; probada en Android 12 con MIUI 13 | [Arquitectura §5.1](03-arquitectura.md#51-base-del-proyecto), §4.6 | CP-1.13 | 1 | — |
+| RNF-01 · Plataforma | Android 8.0+, Kotlin y Compose; probada en Android 12 con MIUI 13 | [Arquitectura §5.1](03-arquitectura.md#51-base-del-proyecto), §4.6 | CP-1.13 | 1 | 2026-10-31 · 1.1 |
 | RNF-02 · Alcance | Un usuario, sin cuentas ni servidor | Arquitectura §1, §4.5 (sin permiso de internet) | Criterio de calidad "Sin cuentas ni red" | 1 | — |
 | RNF-03 · Almacenamiento | Room local, funciona sin internet | [Modelo de datos](02-modelo-de-datos.md) | Criterio de calidad "Sin internet" | 1 | — |
-| RNF-04 · Persistencia | No perder datos; instalar encima con la misma firma | [Modelo de datos §5](02-modelo-de-datos.md#5-versionado-y-migraciones), [arquitectura §5.3](03-arquitectura.md#53-firma-versiones-e-instalación) | CP-1.12, CP-1.15 a CP-1.18, CP-2.12, CP-3.18, CP-5.32, CP-6.11 | 1 | — |
+| RNF-04 · Persistencia | No perder datos; instalar encima con la misma firma | [Modelo de datos §5](02-modelo-de-datos.md#5-versionado-y-migraciones), [arquitectura §5.3](03-arquitectura.md#53-firma-versiones-e-instalación) | CP-1.12, CP-1.15 a CP-1.19, CP-2.12, CP-3.18, CP-5.32, CP-6.11 | 1 | Parcial: 2026-10-31 · 1.1 (firma e instalación encima; migraciones desde el inc. 2) |
 | RNF-05 · Respaldo | Fuera de la app, en una carpeta registrada | Arquitectura §4.4 | CP-3.15, CP-3.18 | 3 | — |
 | RNF-06 · Respaldo | JSON con versiones y fecha | [Diagramas §2.2](05-diagramas-de-comportamiento.md#22-respaldar-ahora) | CP-3.01, CP-3.02, CP-3.10 | 3 | — |
 | RNF-07 · Confiabilidad | Cronómetro desde la hora guardada y servicio en primer plano | Arquitectura §4.3, [diagramas §1.3](05-diagramas-de-comportamiento.md#13-recuperar-una-sesión-después-de-un-cierre) | CP-5.34, CP-5.35 | 5 | — |

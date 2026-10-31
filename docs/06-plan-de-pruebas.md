@@ -73,6 +73,17 @@ flowchart TB
 | Ver los trabajos de WorkManager | `adb shell dumpsys jobscheduler \| grep -A5 com.calendar.tasktodo` |
 | Matar el proceso como lo hace el sistema | `adb shell am kill com.calendar.tasktodo` |
 
+**Preparar el Xiaomi para las pruebas instrumentadas.** MIUI bloquea por defecto que la app de pruebas abra su ventana desde segundo plano (en el registro aparece `MIUILOG- Permission Denied Activity`), y la prueba de interfaz se queda esperando sin fallar. Hace falta, una sola vez:
+
+1. En Opciones de desarrollador: "Depuración USB", "Instalar vía USB" y "Depuración USB (ajustes de seguridad)".
+2. Instalar las apps con `adb install -r`, aceptando el aviso de MIUI en el celular, en lugar de `connectedDebugAndroidTest`, que las desinstala al terminar y con ello borra el permiso:
+   - `adb install -r app/build/outputs/apk/debug/app-debug.apk`
+   - `adb install -r app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk`
+3. En Ajustes → Aplicaciones → TaskToDo (dev) → Otros permisos, permitir **"Mostrar ventanas emergentes mientras se ejecuta en segundo plano"**.
+4. Ejecutar: `adb shell am instrument -w -r com.calendar.tasktodo.debug.test/androidx.test.runner.AndroidJUnitRunner`.
+
+Al reinstalar con `adb install -r` el permiso se conserva. Solo lo necesita la variante de desarrollo.
+
 **Cobertura.** Se mide con la cobertura integrada de AGP (`enableUnitTestCoverage = true` en el tipo `debug`). La meta es **80 % o más** en los paquetes `data.repositorio` y `ui.*` (ViewModels). No se pone meta en las pantallas Compose ni en `sistema`, que se cubren con pruebas de interfaz y manuales.
 
 **Nombres de las pruebas.** En español, describiendo el comportamiento:
@@ -110,6 +121,7 @@ Cada caso tiene un identificador `CP-<incremento>.<número>`, su tipo (U unitari
 | CP-1.16 | M | Instalar la variante `debug` desde Android Studio con la `release` ya instalada. | Aparecen dos apps, "TaskToDo" y "TaskToDo (dev)", cada una con sus propios datos. | RNF-04 |
 | CP-1.17 | M | Intentar instalar un APK firmado con la clave de depuración encima de la `release`. | Android lo rechaza (`INSTALL_FAILED_UPDATE_INCOMPATIBLE`) y los datos no se tocan. Confirma por qué no se debe aceptar desinstalar. | RNF-04 |
 | CP-1.18 | M | Intentar instalar un APK con un `versionCode` menor que el instalado. | Android lo rechaza (`INSTALL_FAILED_VERSION_DOWNGRADE`) y los datos no se tocan. | RNF-04 |
+| CP-1.19 | M | Abrir el APK `release` en el Xiaomi y recorrer Hoy, Calendario, Materias y Ajustes. | La app abre y ninguna pantalla se cierra. Detecta fallos que solo aparecen en `release`, como el de R8 del incremento 1. | RNF-01, RNF-04 |
 
 ### 3.2 Incremento 2 · Actividades, atrasadas y avisos
 
@@ -259,7 +271,7 @@ Cada caso tiene un identificador `CP-<incremento>.<número>`, su tipo (U unitari
 
 Se hace al cerrar cada incremento, después de instalar sobre la versión anterior, y toma unos 10 minutos. Solo se revisan los puntos ya implementados.
 
-1. El APK nuevo se instaló encima del anterior sin pedir desinstalar, y la app abre en el módulo de hoy con los datos de antes de actualizar.
+1. El APK `release` nuevo se instaló encima del anterior sin pedir desinstalar, y la app abre en el módulo de hoy con los datos de antes de actualizar. Las pruebas automáticas corren sobre la variante de desarrollo, así que este paso es el único que prueba la app real.
 2. Crear una actividad con aviso para dentro de 3 minutos, bloquear el celular y esperar a que suene.
 3. Marcar una actividad desde la notificación.
 4. Revisar que las tareas atrasadas aparecen arriba.
