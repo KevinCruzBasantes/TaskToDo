@@ -322,6 +322,9 @@ class RespaldoRepository(
     /** Días desde el último respaldo; nulo si nunca hubo uno (RF-47). */
     fun diasSinRespaldo(ultimo: Instant?): Long? = ultimo?.let { Duration.between(it, Instant.now(reloj)).toDays() }
 
+    /** Sin ningún respaldo, o con más de [DIAS_ADVERTENCIA] días desde el último (RF-47). */
+    fun necesitaAdvertencia(ultimo: Instant?): Boolean = (diasSinRespaldo(ultimo) ?: Long.MAX_VALUE) > DIAS_ADVERTENCIA
+
     companion object {
         /** Más de esto sin respaldar muestra la advertencia (RF-47). */
         const val DIAS_ADVERTENCIA = 7L

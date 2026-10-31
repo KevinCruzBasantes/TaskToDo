@@ -51,7 +51,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.calendar.tasktodo.data.ajustes.Frecuencia
 import com.calendar.tasktodo.data.respaldo.ArchivoRespaldo
 import com.calendar.tasktodo.data.respaldo.LecturaRespaldo
-import com.calendar.tasktodo.data.respaldo.RespaldoRepository
 import com.calendar.tasktodo.data.respaldo.TipoRespaldo
 import com.calendar.tasktodo.ui.componentes.rememberSelectorCarpeta
 import com.calendar.tasktodo.ui.componentes.textoMomento
@@ -118,7 +117,7 @@ fun RespaldoScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp),
         ) {
-            AdvertenciaRespaldo(estado.diasSinRespaldo, hayRespaldo = estado.ultimo != null)
+            AdvertenciaRespaldo(estado.diasSinRespaldo, advertir = estado.advertir)
 
             Text("CARPETA DE RESPALDOS", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
             if (estado.carpetaDisponible) {
@@ -256,14 +255,11 @@ private fun Informar(titulo: String, texto: String, onCerrar: () -> Unit) {
     )
 }
 
-/** Más de una semana sin respaldo, o ninguno todavía (RF-47). */
+/** Más de una semana sin respaldo, o ninguno todavía (RF-47); [advertir] lo decide el repositorio. */
 @Composable
-fun AdvertenciaRespaldo(dias: Long?, hayRespaldo: Boolean, onRespaldar: (() -> Unit)? = null) {
-    val texto = when {
-        !hayRespaldo -> "Aún no tienes ningún respaldo."
-        dias != null && dias > RespaldoRepository.DIAS_ADVERTENCIA -> "Han pasado $dias días sin respaldo."
-        else -> return
-    }
+fun AdvertenciaRespaldo(dias: Long?, advertir: Boolean, onRespaldar: (() -> Unit)? = null) {
+    if (!advertir) return
+    val texto = if (dias == null) "Aún no tienes ningún respaldo." else "Han pasado $dias días sin respaldo."
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
         modifier = Modifier

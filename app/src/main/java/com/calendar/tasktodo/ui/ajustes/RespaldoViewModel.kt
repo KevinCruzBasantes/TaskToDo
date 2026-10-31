@@ -28,6 +28,8 @@ data class RespaldoUiState(
     val carpetaDisponible: Boolean = false,
     val ultimo: Instant? = null,
     val diasSinRespaldo: Long? = null,
+    /** Decidido por el repositorio, no por la pantalla (RF-47). */
+    val advertir: Boolean = false,
     val automatico: Boolean = false,
     val frecuencia: Frecuencia = Frecuencia.SEMANAL,
     val ocupado: Boolean = false,
@@ -56,6 +58,7 @@ class RespaldoViewModel(private val respaldo: RespaldoRepository) : ViewModel() 
                     it.copy(
                         ultimo = r.ultimo,
                         diasSinRespaldo = respaldo.diasSinRespaldo(r.ultimo),
+                        advertir = respaldo.necesitaAdvertencia(r.ultimo),
                         automatico = r.automatico,
                         frecuencia = r.frecuencia,
                     )

@@ -51,7 +51,7 @@ fun AjustesScreen(
         Column(modifier) {
             respaldo?.let { r ->
                 Column(Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)) {
-                    AdvertenciaRespaldo(r.dias, hayRespaldo = r.ultimo != null, onRespaldar = onRespaldo)
+                    AdvertenciaRespaldo(r.dias, advertir = r.advertir, onRespaldar = onRespaldo)
                 }
             }
             ListItem(
@@ -86,13 +86,13 @@ fun AjustesScreen(
     }
 }
 
-data class AjustesUiState(val ultimo: Instant?, val dias: Long?)
+data class AjustesUiState(val ultimo: Instant?, val dias: Long?, val advertir: Boolean)
 
 /** Para la advertencia de más de una semana sin respaldo (RF-47). */
 class AjustesViewModel(respaldo: RespaldoRepository) : ViewModel() {
 
     val estado: StateFlow<AjustesUiState?> = respaldo.estado
-        .map { AjustesUiState(it.ultimo, respaldo.diasSinRespaldo(it.ultimo)) }
+        .map { AjustesUiState(it.ultimo, respaldo.diasSinRespaldo(it.ultimo), respaldo.necesitaAdvertencia(it.ultimo)) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     companion object {

@@ -215,6 +215,9 @@ class RespaldoRepositoryTest {
 
         assertNull(repo.diasSinRespaldo(null))
         assertEquals(9L, repo.diasSinRespaldo(Instant.parse("2026-10-21T09:00:00Z")))
+        assertTrue(repo.necesitaAdvertencia(null))
+        assertTrue(repo.necesitaAdvertencia(Instant.parse("2026-10-21T09:00:00Z")))
+        assertFalse(repo.necesitaAdvertencia(Instant.parse("2026-10-23T09:00:00Z")))
     }
 
     @Test
