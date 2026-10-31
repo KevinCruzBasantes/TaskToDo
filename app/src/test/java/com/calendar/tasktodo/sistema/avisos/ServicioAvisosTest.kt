@@ -47,6 +47,10 @@ class ServicioAvisosTest {
         override fun cerrarActividad(id: Long) {
             cerradas += id
         }
+        val descansos = mutableListOf<Long>()
+        override fun finDescanso(sesion: com.calendar.tasktodo.data.db.entidad.SesionGym) {
+            descansos += sesion.id
+        }
     }
 
     private val horario = DatosDePrueba.horarioCargado()

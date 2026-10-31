@@ -6,7 +6,9 @@ import com.calendar.tasktodo.data.ajustes.AjustesRepository
 import androidx.room.withTransaction
 import com.calendar.tasktodo.data.db.AgendaDatabase
 import com.calendar.tasktodo.data.repositorio.ActividadRepository
+import com.calendar.tasktodo.data.repositorio.GymRepository
 import com.calendar.tasktodo.data.repositorio.HorarioRepository
+import com.calendar.tasktodo.data.repositorio.SesionRepository
 import com.calendar.tasktodo.data.respaldo.RespaldoRepository
 import com.calendar.tasktodo.sistema.avisos.NotificadorAndroid
 import com.calendar.tasktodo.sistema.avisos.ProgramadorAlarmas
@@ -15,6 +17,8 @@ import com.calendar.tasktodo.sistema.compatibilidad.EstadoSistema
 import com.calendar.tasktodo.sistema.compatibilidad.EstadoSistemaAndroid
 import com.calendar.tasktodo.sistema.compatibilidad.PendientesAlAbrir
 import com.calendar.tasktodo.sistema.respaldo.AlmacenSaf
+import com.calendar.tasktodo.sistema.sesion.ControlSesion
+import com.calendar.tasktodo.sistema.sesion.ControlSesionAndroid
 import com.calendar.tasktodo.sistema.respaldo.PlanificadorRespaldoWork
 import java.time.Clock
 
@@ -32,23 +36,38 @@ class AppContainer(context: Context) {
 
     val estadoSistema: EstadoSistema = EstadoSistemaAndroid(context)
 
-    val servicioAvisos = ServicioAvisos(
+    val servicioAvisos: ServicioAvisos = ServicioAvisos(
         actividades = baseDeDatos.actividadDao(),
         clases = baseDeDatos.claseDao(),
         ajustes = ajustesRepository,
         programador = ProgramadorAlarmas(context),
         notificador = NotificadorAndroid(context),
         reloj = reloj,
+        gym = baseDeDatos.gymDao(),
+        alMantenimiento = { gymRepository.generar() },
     )
 
     val horarioRepository = HorarioRepository(baseDeDatos.materiaDao(), baseDeDatos.claseDao(), servicioAvisos)
 
     val actividadRepository = ActividadRepository(baseDeDatos.actividadDao(), servicioAvisos)
 
+    val gymRepository: GymRepository = GymRepository(
+        dao = baseDeDatos.gymDao(),
+        ajustes = ajustesRepository,
+        reloj = reloj,
+        observador = servicioAvisos,
+        transaccion = { bloque -> baseDeDatos.withTransaction { bloque() } },
+    )
+
+    val sesionRepository = SesionRepository(baseDeDatos.gymDao(), baseDeDatos.actividadDao(), reloj, servicioAvisos)
+
+    val controlSesion: ControlSesion = ControlSesionAndroid(context, sesionRepository)
+
     val respaldoRepository = RespaldoRepository(
         materias = baseDeDatos.materiaDao(),
         clases = baseDeDatos.claseDao(),
         actividades = baseDeDatos.actividadDao(),
+        gym = baseDeDatos.gymDao(),
         ajustes = ajustesRepository,
         almacen = AlmacenSaf(context),
         planificador = PlanificadorRespaldoWork(context),
@@ -58,5 +77,5 @@ class AppContainer(context: Context) {
         observador = servicioAvisos,
     )
 
-    val pendientesAlAbrir = PendientesAlAbrir(ajustesRepository, servicioAvisos, reloj, respaldoRepository)
+    val pendientesAlAbrir = PendientesAlAbrir(ajustesRepository, servicioAvisos, reloj, respaldoRepository, gymRepository)
 }

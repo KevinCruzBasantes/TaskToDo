@@ -3,9 +3,12 @@ package com.calendar.tasktodo.sistema.avisos
 import com.calendar.tasktodo.data.ajustes.AjustesRepository
 import com.calendar.tasktodo.data.db.dao.ActividadDao
 import com.calendar.tasktodo.data.db.dao.ClaseDao
+import com.calendar.tasktodo.data.db.dao.GymDao
 import com.calendar.tasktodo.data.db.entidad.ActividadConMateria
 import com.calendar.tasktodo.data.db.entidad.ClaseConMateria
 import com.calendar.tasktodo.data.db.entidad.EstadoActividad
+import com.calendar.tasktodo.data.db.entidad.EstadoSesion
+import com.calendar.tasktodo.data.db.entidad.SesionGym
 import com.calendar.tasktodo.data.repositorio.ObservadorCambios
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.sync.Mutex
@@ -32,6 +35,9 @@ interface Notificador {
     fun resumen(delDia: List<ActividadConMateria>, atrasadas: List<ActividadConMateria>)
 
     fun cerrarActividad(id: Long)
+
+    /** Vibra y avisa que terminó el descanso (RF-29). */
+    fun finDescanso(sesion: SesionGym)
 }
 
 /**
@@ -45,6 +51,9 @@ class ServicioAvisos(
     private val programador: ProgramadorAvisos,
     private val notificador: Notificador,
     private val reloj: Clock,
+    private val gym: GymDao? = null,
+    /** Lo que hace la alarma diaria además de recalcular: extender la ventana del gym (diagramas §5). */
+    private val alMantenimiento: suspend () -> Unit = {},
 ) : ObservadorCambios {
 
     private val candado = Mutex()
@@ -57,8 +66,9 @@ class ServicioAvisos(
         val hoy = ahora.toLocalDate()
         val pendientes = actividades.pendientesEntre(hoy, hoy.plusDays(PlanificadorAvisos.VENTANA_DIAS + 1))
         val todasLasClases = clases.observarTodas().first().map { it.clase }
+        val descanso = gym?.enCurso()?.let { s -> s.descansoTerminaEn?.let { s.id to it } }
 
-        val avisos = PlanificadorAvisos.planificar(pendientes, todasLasClases, configuracion, ahora)
+        val avisos = PlanificadorAvisos.planificar(pendientes, todasLasClases, configuracion, ahora, descanso)
         val codigos = avisos.map { it.codigo }.toSet()
 
         (ajustes.codigosProgramados() - codigos).forEach(programador::cancelar)
@@ -87,7 +97,20 @@ class ServicioAvisos(
                 // Si no hay nada, no se envía (CU-20 1e)
                 if (delDia.isNotEmpty() || atrasadas.isNotEmpty()) notificador.resumen(delDia, atrasadas)
             }
-            TipoAviso.MANTENIMIENTO -> Unit
+            TipoAviso.GYM -> {
+                val actividad = actividades.obtenerConMateria(refId)
+                if (configuracion.gym && actividad?.actividad?.estado == EstadoActividad.PENDIENTE) {
+                    notificador.actividad(actividad, diaAnterior = false)
+                }
+            }
+            TipoAviso.DESCANSO -> gym?.obtenerSesion(refId)?.let { sesion ->
+                if (sesion.estado == EstadoSesion.EN_CURSO && sesion.descansoTerminaEn != null) {
+                    notificador.finDescanso(sesion)
+                    // El descanso ya terminó: la notificación fija vuelve al cronómetro de la sesión
+                    gym.actualizarSesion(sesion.copy(descansoTerminaEn = null))
+                }
+            }
+            TipoAviso.MANTENIMIENTO -> alMantenimiento()
         }
         reprogramarTodo()
     }

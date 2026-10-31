@@ -51,3 +51,25 @@ data class Respaldo(val desdeBienvenida: Boolean = false)
 /** Un día abierto desde la semana del calendario (RF-36); vuelve al calendario con atrás. */
 @Serializable
 data class DiaDesdeCalendario(val fecha: String)
+
+@Serializable
+data object Gym
+
+@Serializable
+data object Rutinas
+
+@Serializable
+data class FormRutina(val id: Long? = null)
+
+@Serializable
+data class DetalleRutina(val id: Long)
+
+@Serializable
+data class FormEjercicio(val rutinaId: Long, val id: Long? = null)
+
+@Serializable
+data object Programacion
+
+/** La sesión de gym de una actividad (CU-16). */
+@Serializable
+data class Sesion(val actividadId: Long)

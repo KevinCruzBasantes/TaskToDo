@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.calendar.tasktodo.data.db.entidad.ActividadConMateria
+import com.calendar.tasktodo.data.db.entidad.TipoActividad
 import com.calendar.tasktodo.ui.componentes.DialogoConfirmar
 import com.calendar.tasktodo.ui.componentes.DialogoFecha
 import com.calendar.tasktodo.ui.componentes.EstadoVacio
@@ -54,6 +55,8 @@ fun DiaScreen(
     onAbrirClase: (Long) -> Unit,
     onAbrirActividad: (Long) -> Unit,
     onNuevaActividad: (LocalDate) -> Unit,
+    /** Tocar una actividad de gym abre su rutina para iniciar la sesión (RF-22). */
+    onAbrirSesion: (Long) -> Unit = onAbrirActividad,
     /** Al abrirse desde la semana (RF-36): flecha para volver y sin barra inferior. */
     onAtras: (() -> Unit)? = null,
     viewModel: DiaViewModel = viewModel(factory = DiaViewModel.factory(fechaInicial)),
@@ -139,7 +142,10 @@ fun DiaScreen(
                         is ElementoDia.DeActividad -> FilaActividad(
                             elemento.actividad, estado.hoy, formatoHora,
                             onCambiarCumplida = { viewModel.cambiarCumplida(elemento.actividad.actividad.id, it) },
-                            onClick = { onAbrirActividad(elemento.actividad.actividad.id) },
+                            onClick = {
+                                val actividad = elemento.actividad.actividad
+                                if (actividad.tipo == TipoActividad.GYM) onAbrirSesion(actividad.id) else onAbrirActividad(actividad.id)
+                            },
                         )
                     }
                 }

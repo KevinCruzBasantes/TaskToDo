@@ -9,6 +9,11 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
+    <!-- Sesión de gym (arquitectura §4.3) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <!-- El respaldo de Android se desactiva: la app tiene su propio respaldo (arquitectura §4.4) -->
     <application
         android:name=".TaskToDoApp"
@@ -32,6 +37,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- specialUse: el tipo health exigiría permisos de sensores que la app no usa -->
+        <service
+            android:name=".sistema.sesion.SesionGymService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Cronómetro y descansos de una sesión de gym que el usuario inició" />
+        </service>
 
         <receiver
             android:name=".sistema.avisos.AvisoReceiver"

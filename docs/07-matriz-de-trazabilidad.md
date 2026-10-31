@@ -57,21 +57,21 @@ La matriz conecta cada requerimiento con su caso de uso, los datos que usa, las 
 | RF-19 | Cambiar de día | CU-10 | — | Hoy | CP-1.10 | 1 | 2026-10-31 · 1.1 |
 | RF-20 | Marcar desde el módulo | CU-08 | `actividad` | Hoy | CP-2.06 | 2 | 2026-10-31 · 2.0 |
 | RF-21 | Agregar con la fecha del día | CU-06 | `actividad` | Hoy, Formulario de actividad | CP-2.02 | 2 | 2026-10-31 · 2.0 |
-| RF-22 | Abrir detalle, o rutina si es gym | CU-10 | `actividad` | Hoy, Detalle de actividad, Sesión de gym | CP-2.13, CP-5.37 | 2 y 5 | Parcial: 2026-10-31 · 2.0 (detalle; la rutina de gym en el inc. 5) |
+| RF-22 | Abrir detalle, o rutina si es gym | CU-10 | `actividad` | Hoy, Detalle de actividad, Sesión de gym | CP-2.13, CP-5.37 | 2 y 5 | 2026-10-31 · 5.0 (detalle en la 2.0; la rutina de gym en la 5.0) |
 
 ### 1.4 Gym
 
 | RF | Resumen | CU | Datos | Pantallas | Pruebas | Inc. | Verificado |
 |---|---|---|---|---|---|---|---|
-| RF-23 | Programar el gym por semana | CU-14 | `dia_gym`, `actividad`, Ajustes | Programación del gym | CP-5.10, CP-5.11, CP-5.12, CP-5.15 | 5 | — |
-| RF-24 | Mover o saltar una sesión | CU-15 | `actividad` | Detalle de actividad, Gym | CP-5.13, CP-5.14 | 5 | — |
-| RF-25 | Gestionar rutinas | CU-12 | `rutina` | Rutinas, Detalle de rutina | CP-5.01, CP-5.08, CP-5.09 | 5 | — |
-| RF-26 | Gestionar ejercicios como bloques reordenables | CU-13 | `ejercicio` | Detalle de rutina, Formulario de ejercicio | CP-5.02 a CP-5.07 | 5 | — |
-| RF-27 | Iniciar sesión con cronómetro | CU-16 | `sesion_gym` | Sesión de gym | CP-5.20 | 5 | — |
-| RF-28 | Contador de series, prellenado y orden en la sesión | CU-16 | `sesion_gym`, `serie_realizada`, `ejercicio` | Sesión de gym | CP-5.21, CP-5.22, CP-5.26 a CP-5.28 | 5 | — |
-| RF-29 | Descansos y cuenta regresiva | CU-16 | `sesion_gym` | Sesión de gym | CP-5.22 a CP-5.25, CP-5.33 | 5 | — |
-| RF-30 | Notificación fija de la sesión | CU-16 | `sesion_gym` | Notificación de la sesión | CP-5.33 | 5 | — |
-| RF-31 | Guardar sesión; no realizada si no se hizo | CU-16 | `sesion_gym`, `serie_realizada`, `actividad` | Sesión de gym, Hoy | CP-5.29 a CP-5.31 | 5 | — |
+| RF-23 | Programar el gym por semana | CU-14 | `dia_gym`, `actividad`, Ajustes | Programación del gym | CP-5.10, CP-5.11, CP-5.12, CP-5.15 | 5 | 2026-10-31 · 5.0 |
+| RF-24 | Mover o saltar una sesión | CU-15 | `actividad` | Detalle de actividad, Gym | CP-5.13, CP-5.14 | 5 | 2026-10-31 · 5.0 |
+| RF-25 | Gestionar rutinas | CU-12 | `rutina` | Rutinas, Detalle de rutina | CP-5.01, CP-5.08, CP-5.09 | 5 | 2026-10-31 · 5.0 |
+| RF-26 | Gestionar ejercicios como bloques reordenables | CU-13 | `ejercicio` | Detalle de rutina, Formulario de ejercicio | CP-5.02 a CP-5.07 | 5 | 2026-10-31 · 5.0 |
+| RF-27 | Iniciar sesión con cronómetro | CU-16 | `sesion_gym` | Sesión de gym | CP-5.20 | 5 | 2026-10-31 · 5.0 |
+| RF-28 | Contador de series, prellenado y orden en la sesión | CU-16 | `sesion_gym`, `serie_realizada`, `ejercicio` | Sesión de gym | CP-5.21, CP-5.22, CP-5.26 a CP-5.28 | 5 | 2026-10-31 · 5.0 |
+| RF-29 | Descansos y cuenta regresiva | CU-16 | `sesion_gym` | Sesión de gym | CP-5.22 a CP-5.25, CP-5.33 | 5 | 2026-10-31 · 5.0 (manual CP-5.33 hecha por el usuario) |
+| RF-30 | Notificación fija de la sesión | CU-16 | `sesion_gym` | Notificación de la sesión | CP-5.33 | 5 | 2026-10-31 · 5.0 (manual hecha por el usuario) |
+| RF-31 | Guardar sesión; no realizada si no se hizo | CU-16 | `sesion_gym`, `serie_realizada`, `actividad` | Sesión de gym, Hoy | CP-5.29 a CP-5.31 | 5 | 2026-10-31 · 5.0 |
 | RF-32 | Registros de peso, estatura e IMC | CU-17 | `registro_peso`, Ajustes | Peso e IMC | CP-6.01 a CP-6.05 | 6 | — |
 | RF-33 | Estadísticas con gráficas | CU-18 | `sesion_gym`, `serie_realizada`, `actividad`, `registro_peso` | Estadísticas | CP-6.06 a CP-6.10 | 6 | — |
 
@@ -90,7 +90,7 @@ La matriz conecta cada requerimiento con su caso de uso, los datos que usa, las 
 |---|---|---|---|---|---|---|---|
 | RF-38 | Aviso por actividad, con hora fija si no tiene hora | CU-19, CU-20 | `actividad`, Ajustes | Formulario de actividad, Ajustes y avisos | CP-2.20, CP-2.21, CP-2.23, CP-2.24 | 2 | 2026-10-31 · 2.0 (manuales CP-2.32 a CP-2.38 hechas por el usuario) |
 | RF-39 | Aviso del día anterior en exámenes y simulacros | CU-19, CU-20 | `actividad`, Ajustes | Ajustes y avisos | CP-2.22 | 2 | 2026-10-31 · 2.0 (manuales CP-2.32 a CP-2.38 hechas por el usuario) |
-| RF-40 | Aviso de gym con la rutina | CU-20 | `actividad`, `dia_gym`, Ajustes | Ajustes y avisos | CP-5.16 | 5 | — |
+| RF-40 | Aviso de gym con la rutina | CU-20 | `actividad`, `dia_gym`, Ajustes | Ajustes y avisos | CP-5.16 | 5 | 2026-10-31 · 5.0 |
 | RF-41 | Aviso de clases, desactivado por defecto | CU-19, CU-20 | `clase`, Ajustes | Ajustes y avisos | CP-2.26 | 2 | 2026-10-31 · 2.0 (manuales CP-2.32 a CP-2.38 hechas por el usuario) |
 | RF-42 | Resumen del día | CU-20 | `actividad`, Ajustes | Ajustes y avisos | CP-2.27 | 2 | 2026-10-31 · 2.0 (manuales CP-2.32 a CP-2.38 hechas por el usuario) |
 | RF-43 | Marcar desde la notificación, activar por tipo, reprogramar al reiniciar | CU-08, CU-19, CU-20 | `actividad`, Ajustes | Notificación, Ajustes y avisos | CP-2.25, CP-2.30, CP-2.31, CP-2.33, CP-2.37 | 2 | 2026-10-31 · 2.0 (manuales CP-2.32 a CP-2.38 hechas por el usuario) |
@@ -115,10 +115,10 @@ Los RNF valen para toda la app, así que se verifican en cada incremento desde e
 | RNF-01 · Plataforma | Android 8.0+, Kotlin y Compose; probada en Android 12 con MIUI 13 | [Arquitectura §5.1](03-arquitectura.md#51-base-del-proyecto), §4.6 | CP-1.13 | 1 | 2026-10-31 · 1.1 |
 | RNF-02 · Alcance | Un usuario, sin cuentas ni servidor | Arquitectura §1, §4.5 (sin permiso de internet) | Criterio de calidad "Sin cuentas ni red" | 1 | — |
 | RNF-03 · Almacenamiento | Room local, funciona sin internet | [Modelo de datos](02-modelo-de-datos.md) | Criterio de calidad "Sin internet" | 1 | — |
-| RNF-04 · Persistencia | No perder datos; instalar encima con la misma firma | [Modelo de datos §5](02-modelo-de-datos.md#5-versionado-y-migraciones), [arquitectura §5.3](03-arquitectura.md#53-firma-versiones-e-instalación) | CP-1.12, CP-1.15 a CP-1.19, CP-2.12, CP-3.18, CP-5.32, CP-6.11 | 1 | Parcial: 2026-10-31 · 3.0 (firma, instalación encima, migración 1→2 y reinstalación con restauración) |
+| RNF-04 · Persistencia | No perder datos; instalar encima con la misma firma | [Modelo de datos §5](02-modelo-de-datos.md#5-versionado-y-migraciones), [arquitectura §5.3](03-arquitectura.md#53-firma-versiones-e-instalación) | CP-1.12, CP-1.15 a CP-1.19, CP-2.12, CP-3.18, CP-5.32, CP-6.11 | 1 | Parcial: 2026-10-31 · 5.0 (firma, instalación encima, migraciones 1→2 y 2→3, y reinstalación con restauración; falta la del inc. 6) |
 | RNF-05 · Respaldo | Fuera de la app, en una carpeta registrada | Arquitectura §4.4 | CP-3.15, CP-3.18 | 3 | 2026-10-31 · 3.0 (reinstalación CP-3.18 hecha por el usuario) |
 | RNF-06 · Respaldo | JSON con versiones y fecha | [Diagramas §2.2](05-diagramas-de-comportamiento.md#22-respaldar-ahora) | CP-3.01, CP-3.02, CP-3.10 | 3 | 2026-10-31 · 3.0 |
-| RNF-07 · Confiabilidad | Cronómetro desde la hora guardada y servicio en primer plano | Arquitectura §4.3, [diagramas §1.3](05-diagramas-de-comportamiento.md#13-recuperar-una-sesión-después-de-un-cierre) | CP-5.34, CP-5.35 | 5 | — |
+| RNF-07 · Confiabilidad | Cronómetro desde la hora guardada y servicio en primer plano | Arquitectura §4.3, [diagramas §1.3](05-diagramas-de-comportamiento.md#13-recuperar-una-sesión-después-de-un-cierre) | CP-5.34, CP-5.35 | 5 | 2026-10-31 · 5.0 (manuales hechas por el usuario) |
 | RNF-08 · Usabilidad | Un toque para marcar y para confirmar una serie | [Diseño de interfaz §1](04-diseno-de-interfaz.md#1-principios-de-diseño) | CP-2.06, CP-5.22 | 2 | 2026-10-31 · 2.0 |
 | RNF-09 · Mantenibilidad | MVVM por capas | [Arquitectura §2](03-arquitectura.md#2-capas-mvvm) | Criterio de calidad "Capas MVVM" | 1 | — |
 | RNF-10 · Notificaciones | Avisos con ±1 minuto, con alarmas del sistema | Arquitectura §4.2, [diagramas §3](05-diagramas-de-comportamiento.md#3-programación-de-avisos) | CP-2.28, CP-2.29, CP-2.32, CP-2.38 | 2 | 2026-10-31 · 2.0 (manuales CP-2.32 y CP-2.38 hechas por el usuario) |

@@ -144,4 +144,29 @@ class PlanificadorAvisosTest {
         assertTrue(avisos.all { it.instante.isAfter(ahora.toInstant()) })
         assertTrue(avisos.all { LocalDate.ofInstant(it.instante, ZoneOffset.UTC) <= HOY.plusDays(7) })
     }
+
+    @Test
+    fun `el gym avisa con los minutos de los ajustes y no usa el aviso de la actividad (CP-5_16)`() {
+        val gym = Actividad(id = 80, titulo = "Pierna", tipo = TipoActividad.GYM, fecha = HOY, hora = hora(18), avisoMinutosAntes = 120)
+
+        val avisos = planificar(listOf(gym), AjustesAvisos(minutosGym = 15))
+        assertEquals(listOf(instante(30, 10, 17, 45)), avisos.de(TipoAviso.GYM).map { it.instante })
+        assertTrue(avisos.de(TipoAviso.ACTIVIDAD).isEmpty())
+
+        assertTrue(planificar(listOf(gym), AjustesAvisos(gym = false)).de(TipoAviso.GYM).isEmpty())
+        assertTrue(planificar(listOf(gym.copy(estado = EstadoActividad.SALTADA))).de(TipoAviso.GYM).isEmpty())
+    }
+
+    @Test
+    fun `el fin del descanso es una alarma del sistema aunque los avisos esten apagados (RF-29)`() {
+        val fin = ahora.toInstant().plusSeconds(90)
+        val apagados = AjustesAvisos(actividades = false, diaAnterior = false, resumen = false, gym = false, prioridadAlarma = false)
+
+        val descanso = PlanificadorAvisos.planificar(emptyList(), emptyList(), apagados, ahora, descanso = 77L to fin).de(TipoAviso.DESCANSO).single()
+
+        assertEquals(fin, descanso.instante)
+        assertEquals(775, descanso.codigo)
+        assertEquals(ModoAlarma.RELOJ, elegirModo(descanso, puedeExactas = true))
+        assertTrue(PlanificadorAvisos.planificar(emptyList(), emptyList(), apagados, ahora, descanso = 77L to ahora.toInstant().minusSeconds(1)).de(TipoAviso.DESCANSO).isEmpty())
+    }
 }

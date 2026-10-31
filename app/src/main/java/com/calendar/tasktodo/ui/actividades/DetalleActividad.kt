@@ -98,6 +98,7 @@ fun DetalleActividadScreen(
     id: Long,
     onAtras: () -> Unit,
     onEditar: (Long) -> Unit,
+    onAbrirSesion: (Long) -> Unit = {},
     viewModel: DetalleActividadViewModel = viewModel(factory = DetalleActividadViewModel.factory(id)),
 ) {
     val estado by viewModel.estado.collectAsStateWithLifecycle()
@@ -116,7 +117,7 @@ fun DetalleActividadScreen(
                     IconButton(onClick = onAtras) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás") }
                 },
                 actions = {
-                    if (item != null) {
+                    if (item != null && item.actividad.tipo != TipoActividad.GYM) {
                         IconButton(onClick = { onEditar(id) }) { Icon(Icons.Filled.Edit, contentDescription = "Editar") }
                         IconButton(onClick = { confirmando = true }) { Icon(Icons.Filled.Delete, contentDescription = "Eliminar") }
                     }
@@ -159,7 +160,12 @@ fun DetalleActividadScreen(
                 Text("Notas", style = MaterialTheme.typography.labelLarge)
                 Text(it, style = MaterialTheme.typography.bodyLarge)
             }
-            if (actividad.tipo != TipoActividad.GYM) {
+            if (actividad.tipo == TipoActividad.GYM) {
+                Spacer(Modifier.height(24.dp))
+                Button(onClick = { onAbrirSesion(actividad.id) }, modifier = Modifier.fillMaxWidth()) {
+                    Text(if (situacion == Situacion.CUMPLIDA) "Ver sesión" else "Abrir la rutina")
+                }
+            } else {
                 Spacer(Modifier.height(24.dp))
                 if (situacion == Situacion.CUMPLIDA) {
                     OutlinedButton(onClick = { viewModel.cambiarCumplida(false) }, modifier = Modifier.fillMaxWidth()) {

@@ -61,4 +61,4 @@ class ProgramadorAlarmas(private val context: Context) : ProgramadorAvisos {
     )
 }
 
-val TipoAviso.esDeActividad: Boolean get() = this == TipoAviso.ACTIVIDAD || this == TipoAviso.DIA_ANTERIOR
+val TipoAviso.esDeActividad: Boolean get() = this == TipoAviso.ACTIVIDAD || this == TipoAviso.DIA_ANTERIOR || this == TipoAviso.GYM

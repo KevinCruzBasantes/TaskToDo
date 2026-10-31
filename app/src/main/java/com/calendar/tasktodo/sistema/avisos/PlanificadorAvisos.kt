@@ -4,6 +4,7 @@ import com.calendar.tasktodo.data.ajustes.AjustesAvisos
 import com.calendar.tasktodo.data.db.entidad.Actividad
 import com.calendar.tasktodo.data.db.entidad.Clase
 import com.calendar.tasktodo.data.db.entidad.EstadoActividad
+import com.calendar.tasktodo.data.db.entidad.TipoActividad
 import com.calendar.tasktodo.data.db.entidad.tieneAvisoDiaAnterior
 import java.time.Instant
 import java.time.LocalDate
@@ -17,13 +18,19 @@ enum class TipoAviso(val digito: Int) {
     CLASE(2),
     RESUMEN(3),
 
+    /** Antes de una sesión de gym, con el nombre de la rutina (RF-40). */
+    GYM(4),
+
+    /** Fin del descanso de la sesión en curso; su refId es el de la sesión (RF-29). */
+    DESCANSO(5),
+
     /** Alarma silenciosa diaria que solo vuelve a calcular la ventana. */
     MANTENIMIENTO(9),
 }
 
 data class AvisoProgramado(
     val tipo: TipoAviso,
-    /** Id de la actividad o de la clase; 0 en el resumen y el mantenimiento. */
+    /** Id de la actividad, la clase o la sesión; 0 en el resumen y el mantenimiento. */
     val refId: Long,
     val instante: Instant,
     val prioridad: Boolean,
@@ -66,6 +73,8 @@ object PlanificadorAvisos {
         clases: List<Clase>,
         ajustes: AjustesAvisos,
         ahora: ZonedDateTime,
+        /** Sesión en curso y fin de su descanso, si hay uno (RF-29). */
+        descanso: Pair<Long, Instant>? = null,
     ): List<AvisoProgramado> {
         val limite = ahora.plusDays(VENTANA_DIAS)
         val hoy = ahora.toLocalDate()
@@ -77,6 +86,12 @@ object PlanificadorAvisos {
         val avisos = mutableListOf<AvisoProgramado>()
 
         actividades.filter { it.estado == EstadoActividad.PENDIENTE }.forEach { actividad ->
+            if (actividad.tipo == TipoActividad.GYM) {
+                // El gym usa los minutos de los ajustes, no los de cada actividad (RF-40)
+                val momento = actividad.hora?.let { en(actividad.fecha, it).minusMinutes(ajustes.minutosGym.toLong()) }
+                if (ajustes.gym && momento != null && dentro(momento)) avisos += aviso(TipoAviso.GYM, actividad.id, momento)
+                return@forEach
+            }
             val minutos = actividad.avisoMinutosAntes
             if (ajustes.actividades && minutos != null) {
                 // Sin hora, el aviso va a la hora fija de los ajustes (RF-38)
@@ -99,6 +114,11 @@ object PlanificadorAvisos {
                     .firstOrNull(::dentro)
                     ?.let { avisos += aviso(TipoAviso.CLASE, clase.id, it) }
             }
+        }
+
+        // El fin del descanso suena aunque los demás avisos estén apagados: es parte de la sesión
+        descanso?.let { (sesionId, fin) ->
+            if (fin.isAfter(ahora.toInstant())) avisos += AvisoProgramado(TipoAviso.DESCANSO, sesionId, fin, prioridad = true)
         }
 
         if (ajustes.resumen) avisos += aviso(TipoAviso.RESUMEN, 0, siguiente(ahora, ajustes.horaResumen))

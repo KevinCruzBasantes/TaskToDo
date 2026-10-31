@@ -9,6 +9,10 @@ import com.calendar.tasktodo.data.ajustes.Frecuencia
 import com.calendar.tasktodo.data.db.AgendaDatabase
 import com.calendar.tasktodo.data.db.entidad.Actividad
 import com.calendar.tasktodo.data.db.entidad.Clase
+import com.calendar.tasktodo.data.db.entidad.DiaGym
+import com.calendar.tasktodo.data.db.entidad.Ejercicio
+import com.calendar.tasktodo.data.db.entidad.Medida
+import com.calendar.tasktodo.data.db.entidad.Rutina
 import com.calendar.tasktodo.data.db.entidad.Materia
 import com.calendar.tasktodo.data.db.entidad.TipoActividad
 import androidx.datastore.core.DataStore
@@ -70,7 +74,7 @@ class RestauracionRoomTest {
     fun crear() {
         db = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), AgendaDatabase::class.java).build()
         repo = RespaldoRepository(
-            db.materiaDao(), db.claseDao(), db.actividadDao(), AjustesRepository(DataStoreEnMemoria()), almacen, planificador,
+            db.materiaDao(), db.claseDao(), db.actividadDao(), db.gymDao(), AjustesRepository(DataStoreEnMemoria()), almacen, planificador,
             transaccion = { bloque -> db.withTransaction { bloque() } },
             reloj = Clock.systemUTC(),
             versionApp = "prueba",
@@ -80,6 +84,13 @@ class RestauracionRoomTest {
             val calculo = db.materiaDao().insertar(Materia(nombre = "Cálculo", color = 1))
             db.claseDao().insertar(Clase(materiaId = calculo, diaSemana = DayOfWeek.MONDAY, horaInicio = LocalTime.of(7, 0), horaFin = LocalTime.of(9, 0)))
             db.actividadDao().insertar(Actividad(titulo = "Tarea", tipo = TipoActividad.TAREA, fecha = LocalDate.of(2026, 11, 2), materiaId = calculo))
+            val pierna = db.gymDao().insertarRutina(Rutina(nombre = "Pierna", descansoEntreEjerciciosSeg = 120))
+            db.gymDao().insertarEjercicio(Ejercicio(rutinaId = pierna, orden = 0, nombre = "Sentadilla", medida = Medida.REPETICIONES, series = 4, repeticiones = 10, pesoKg = 60.0))
+            val dia = db.gymDao().insertarDia(DiaGym(diaSemana = DayOfWeek.MONDAY, hora = LocalTime.of(18, 0), rutinaId = pierna))
+            db.gymDao().insertarGenerada(
+                Actividad(titulo = "Pierna", tipo = TipoActividad.GYM, fecha = LocalDate.of(2026, 11, 2), hora = LocalTime.of(18, 0),
+                    rutinaId = pierna, diaGymId = dia, fechaProgramada = LocalDate.of(2026, 11, 2)),
+            )
         }
     }
 
@@ -90,12 +101,14 @@ class RestauracionRoomTest {
     fun respaldarYRestaurarConRoomDejaLosMismosDatosEIds_CP_3_08() = runBlocking {
         val contenido = repo.generar()
         val antes = Triple(db.materiaDao().todas(), db.claseDao().todas(), db.actividadDao().todas())
+        val gymAntes = Triple(db.gymDao().rutinas(), db.gymDao().todosLosEjercicios(), db.gymDao().dias())
         db.materiaDao().eliminarTodas()
         db.materiaDao().insertar(Materia(nombre = "Otra", color = 2))
 
         assertEquals(ResultadoRestauracion.Exito, repo.restaurar(contenido))
 
         assertEquals(antes, Triple(db.materiaDao().todas(), db.claseDao().todas(), db.actividadDao().todas()))
+        assertEquals(gymAntes, Triple(db.gymDao().rutinas(), db.gymDao().todosLosEjercicios(), db.gymDao().dias()))
         assertTrue(archivos.keys.any { it.startsWith("agenda-seguridad-") })
     }
 

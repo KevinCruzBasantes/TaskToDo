@@ -30,7 +30,7 @@ class RespaldoViewModelTest {
 
     private fun vm() = RespaldoViewModel(
         RespaldoRepository(
-            horario.materiaDao, horario.claseDao, horario.actividadDao, ajustes.repositorio, almacen, planificador,
+            horario.materiaDao, horario.claseDao, horario.actividadDao, horario.gymDao, ajustes.repositorio, almacen, planificador,
             transaccion = { it() }, reloj = DatosDePrueba.reloj, versionApp = "3.0", io = Dispatchers.Unconfined,
         ),
     )

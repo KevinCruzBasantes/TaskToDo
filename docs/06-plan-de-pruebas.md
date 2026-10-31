@@ -253,6 +253,13 @@ Cada caso tiene un identificador `CP-<incremento>.<número>`, su tipo (U unitari
 | CP-5.36 | M | Pantalla de sesión abierta 3 minutos sin tocarla. | La pantalla no se apaga. | Diseño §3.11 |
 | CP-5.37 | UI | Tocar una actividad de gym en el módulo del día. | Se abre su rutina con el botón "Iniciar sesión". | RF-22 |
 
+**Cómo quedaron implementadas (incremento 5)**
+
+- CP-5.03, CP-5.05 y CP-5.06 se probaron como unitarias: CP-5.03 sobre `FormEjercicioViewModel`, y CP-5.05 y CP-5.06 sobre `GymRepository.moverEjercicio`. El arrastre y el "Deshacer" de la pantalla los revisó el usuario en el Xiaomi.
+- CP-5.07 a CP-5.09 se probaron como unitarias con `GymFalso`, que reproduce las reglas de Room que importan: RESTRICT de la rutina, CASCADE de los ejercicios y la clave única de las actividades generadas. La migración CP-5.32 y el respaldo con datos de gym sí corren con Room real en el celular.
+- CP-5.15 y CP-5.37 no tienen prueba automática: el filtro de rutinas vacías está en `ProgramacionViewModel`, y abrir la sesión desde el módulo del día lo revisó el usuario. Quedan para agregarlas en el incremento 6.
+- Las manuales CP-5.33 a CP-5.36 las hizo el usuario el 31 de octubre de 2026 con la app dev, y después se instaló la 5.0 encima de la 4.0 sin perder datos (CP-1.19).
+
 ### 3.6 Incremento 6 · Peso, IMC y estadísticas
 
 | ID | Tipo | Caso | Resultado esperado | Verifica |

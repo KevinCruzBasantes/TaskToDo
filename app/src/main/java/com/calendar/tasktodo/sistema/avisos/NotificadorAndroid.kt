@@ -14,15 +14,20 @@ import androidx.core.content.ContextCompat
 import com.calendar.tasktodo.MainActivity
 import com.calendar.tasktodo.data.db.entidad.ActividadConMateria
 import com.calendar.tasktodo.data.db.entidad.ClaseConMateria
+import com.calendar.tasktodo.data.db.entidad.SesionGym
+import com.calendar.tasktodo.data.db.entidad.TipoActividad
 import com.calendar.tasktodo.ui.ESPANOL
 import java.time.format.DateTimeFormatter
 
-/** Canales de notificación (arquitectura §4.2). Los de gym llegan con su incremento. */
+/** Canales de notificación (arquitectura §4.2). */
 object Canales {
     const val ACTIVIDADES = "actividades"
     const val CLASES = "clases"
     const val RESUMEN = "resumen"
     const val RESPALDO = "respaldo"
+    const val GYM = "gym"
+    const val SESION = "sesion"
+    const val FIN_DESCANSO = "fin_descanso"
 
     fun crear(context: Context) {
         val gestor = context.getSystemService(NotificationManager::class.java)
@@ -36,6 +41,20 @@ object Canales {
                     .apply { description = "Lo que hay para hoy y las tareas atrasadas" },
                 NotificationChannel(RESPALDO, "Respaldo", NotificationManager.IMPORTANCE_LOW)
                     .apply { description = "Respaldo automático fallido" },
+                NotificationChannel(GYM, "Gym", NotificationManager.IMPORTANCE_HIGH)
+                    .apply { description = "Aviso antes de cada sesión" },
+                NotificationChannel(SESION, "Sesión en curso", NotificationManager.IMPORTANCE_LOW)
+                    .apply {
+                        description = "Cronómetro de la sesión de gym"
+                        setSound(null, null)
+                        enableVibration(false)
+                    },
+                NotificationChannel(FIN_DESCANSO, "Fin de descanso", NotificationManager.IMPORTANCE_HIGH)
+                    .apply {
+                        description = "Aviso al terminar un descanso"
+                        enableVibration(true)
+                        vibrationPattern = longArrayOf(0, 400, 200, 400)
+                    },
             ),
         )
     }
@@ -47,6 +66,7 @@ class NotificadorAndroid(private val context: Context) : Notificador {
 
     override fun actividad(actividad: ActividadConMateria, diaAnterior: Boolean) {
         val datos = actividad.actividad
+        if (datos.tipo == TipoActividad.GYM) return gym(actividad)
         val tipo = if (diaAnterior) TipoAviso.DIA_ANTERIOR else TipoAviso.ACTIVIDAD
         val codigo = AvisoProgramado.codigoDe(tipo, datos.id)
         val hora = datos.hora?.format(formatoHora)
@@ -102,6 +122,43 @@ class NotificadorAndroid(private val context: Context) : Notificador {
                 .setContentIntent(abrir(codigo, null)),
         )
     }
+
+    /** Antes de la sesión, con el nombre de la rutina; sin check, porque se cumple al guardar la sesión (RF-40). */
+    private fun gym(actividad: ActividadConMateria) {
+        val datos = actividad.actividad
+        val codigo = AvisoProgramado.codigoDe(TipoAviso.GYM, datos.id)
+        mostrar(
+            codigo,
+            NotificationCompat.Builder(context, Canales.GYM)
+                .setContentTitle("🏋 ${datos.titulo}")
+                .setContentText("Gym a las ${datos.hora?.format(formatoHora).orEmpty()}")
+                .setCategory(NotificationCompat.CATEGORY_REMINDER)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(abrirSesion(codigo, datos.id)),
+        )
+    }
+
+    override fun finDescanso(sesion: SesionGym) {
+        val codigo = AvisoProgramado.codigoDe(TipoAviso.DESCANSO, sesion.id)
+        mostrar(
+            codigo,
+            NotificationCompat.Builder(context, Canales.FIN_DESCANSO)
+                .setContentTitle("Terminó el descanso")
+                .setContentText("Sigue con ${sesion.nombreRutina}")
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setVibrate(longArrayOf(0, 400, 200, 400))
+                .setTimeoutAfter(60_000)
+                .setContentIntent(abrirSesion(codigo, sesion.actividadId)),
+        )
+    }
+
+    private fun abrirSesion(codigo: Int, actividadId: Long?): PendingIntent = PendingIntent.getActivity(
+        context,
+        codigo,
+        MainActivity.intentDeSesion(context, actividadId),
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+    )
 
     override fun cerrarActividad(id: Long) {
         val gestor = NotificationManagerCompat.from(context)

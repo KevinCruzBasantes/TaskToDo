@@ -5,6 +5,7 @@ import com.calendar.tasktodo.data.ajustes.Frecuencia
 import com.calendar.tasktodo.data.db.AgendaDatabase
 import com.calendar.tasktodo.data.db.dao.ActividadDao
 import com.calendar.tasktodo.data.db.dao.ClaseDao
+import com.calendar.tasktodo.data.db.dao.GymDao
 import com.calendar.tasktodo.data.db.dao.MateriaDao
 import com.calendar.tasktodo.data.repositorio.ObservadorCambios
 import kotlinx.coroutines.CoroutineDispatcher
@@ -16,6 +17,7 @@ import kotlinx.serialization.json.Json
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -112,6 +114,7 @@ class RespaldoRepository(
     private val materias: MateriaDao,
     private val clases: ClaseDao,
     private val actividades: ActividadDao,
+    private val gym: GymDao,
     private val ajustes: AjustesRepository,
     private val almacen: AlmacenRespaldos,
     private val planificador: PlanificadorRespaldo,
@@ -135,15 +138,21 @@ class RespaldoRepository(
         lateinit var dto: RespaldoDto
         val respaldo = ajustes.respaldo.first()
         val avisos = ajustes.avisos.first()
+        val finGym = ajustes.finProgramacionGym.first()
         transaccion {
             dto = RespaldoDto(
                 versionBaseDatos = AgendaDatabase.VERSION,
                 versionApp = versionApp,
                 fecha = Instant.now(reloj).toString(),
-                ajustes = avisos.aDto(respaldo.automatico, respaldo.frecuencia),
+                ajustes = avisos.aDto(respaldo.automatico, respaldo.frecuencia, finGym),
                 materias = materias.todas().map { it.aDto() },
                 clases = clases.todas().map { it.aDto() },
                 actividades = actividades.todas().map { it.aDto() },
+                rutinas = gym.rutinas().map { it.aDto() },
+                ejercicios = gym.todosLosEjercicios().map { it.aDto() },
+                diasGym = gym.dias().map { it.aDto() },
+                sesiones = gym.todasLasSesiones().map { it.aDto() },
+                series = gym.todasLasSeries().map { it.aDto() },
             )
         }
         return json.encodeToString(RespaldoDto.serializer(), dto)
@@ -251,20 +260,38 @@ class RespaldoRepository(
             is ResultadoRespaldo.Exito -> Unit
         }
         try {
-            val nuevas = Triple(dto.materias.map { it.aEntidad() }, dto.clases.map { it.aEntidad() }, dto.actividades.map { it.aEntidad() })
+            val nuevasMaterias = dto.materias.map { it.aEntidad() }
+            val nuevasClases = dto.clases.map { it.aEntidad() }
+            val nuevasActividades = dto.actividades.map { it.aEntidad() }
+            val nuevasRutinas = dto.rutinas.map { it.aEntidad() }
+            val nuevosEjercicios = dto.ejercicios.map { it.aEntidad() }
+            val nuevosDias = dto.diasGym.map { it.aEntidad() }
+            val nuevasSesiones = dto.sesiones.map { it.aEntidad() }
+            val nuevasSeries = dto.series.map { it.aEntidad() }
             transaccion {
-                // Primero los hijos y después los padres al borrar; al revés al insertar
+                // Primero los hijos y después los padres al borrar; al revés al insertar (diagramas §2.3)
+                gym.vaciarSeries()
+                gym.vaciarSesiones()
                 actividades.eliminarTodas()
+                gym.vaciarDias()
+                gym.vaciarEjercicios()
                 clases.eliminarTodas()
+                gym.vaciarRutinas()
                 materias.eliminarTodas()
-                materias.insertarTodas(nuevas.first)
-                clases.insertarTodas(nuevas.second)
-                actividades.insertarTodas(nuevas.third)
+                materias.insertarTodas(nuevasMaterias)
+                clases.insertarTodas(nuevasClases)
+                gym.insertarRutinas(nuevasRutinas)
+                gym.insertarEjercicios(nuevosEjercicios)
+                gym.insertarDias(nuevosDias)
+                actividades.insertarTodas(nuevasActividades)
+                gym.insertarSesiones(nuevasSesiones)
+                gym.insertarSeries(nuevasSeries)
             }
         } catch (e: Exception) {
             return ResultadoRestauracion.Error(e.message ?: "No se pudo restaurar")
         }
         ajustes.guardarAvisos(dto.ajustes.avisos())
+        ajustes.guardarFinProgramacionGym(dto.ajustes.finProgramacionGym?.let(LocalDate::parse))
         val frecuencia = Frecuencia.entries.firstOrNull { it.name == dto.ajustes.frecuenciaRespaldo } ?: Frecuencia.SEMANAL
         configurarAutomatico(dto.ajustes.respaldoAutomatico, frecuencia)
         observador.huboCambios()

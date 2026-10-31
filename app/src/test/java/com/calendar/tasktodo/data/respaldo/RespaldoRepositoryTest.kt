@@ -40,6 +40,7 @@ class RespaldoRepositoryTest {
         materias = horario.materiaDao,
         clases = horario.claseDao,
         actividades = horario.actividadDao,
+        gym = horario.gymDao,
         ajustes = ajustes.repositorio,
         almacen = almacen,
         planificador = planificador,

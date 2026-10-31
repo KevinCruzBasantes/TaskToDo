@@ -203,6 +203,8 @@ class HorarioFalso {
             actividades.update { lista -> lista.filterNot { it.id == actividad.id } }
     }
 
+    val gymDao = GymFalso(actividades)
+
     val repositorio = HorarioRepository(materiaDao, claseDao, observador)
 
     val actividadRepositorio = ActividadRepository(actividadDao, observador)

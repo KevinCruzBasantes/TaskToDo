@@ -30,8 +30,8 @@ android {
         applicationId = "com.calendar.tasktodo"
         minSdk = 26
         targetSdk = 37
-        versionCode = 5
-        versionName = "4.0"
+        versionCode = 6
+        versionName = "5.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders["appLabel"] = "TaskToDo"
@@ -101,6 +101,7 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.documentfile)
+    implementation(libs.reorderable)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalTime
 
 /** Configuración de los avisos (CU-19). Los valores por defecto son los del diseño de interfaz §3.14. */
@@ -26,6 +27,9 @@ data class AjustesAvisos(
     val horaResumen: LocalTime = LocalTime.of(7, 0),
     /** `setAlarmClock` para cumplir el margen de ±1 minuto (RNF-10). */
     val prioridadAlarma: Boolean = true,
+    /** Aviso antes de cada sesión de gym, con el nombre de la rutina (RF-40). */
+    val gym: Boolean = true,
+    val minutosGym: Int = 15,
 )
 
 /** Cada cuánto se hace el respaldo automático (RF-46). */
@@ -54,7 +58,16 @@ class AjustesRepository(private val datos: DataStore<Preferences>) {
             resumen = p[RESUMEN] ?: porDefecto.resumen,
             horaResumen = p[HORA_RESUMEN]?.let(LocalTime::parse) ?: porDefecto.horaResumen,
             prioridadAlarma = p[PRIORIDAD_ALARMA] ?: porDefecto.prioridadAlarma,
+            gym = p[AVISO_GYM] ?: porDefecto.gym,
+            minutosGym = p[MINUTOS_GYM] ?: porDefecto.minutosGym,
         )
+    }
+
+    /** Fecha de fin opcional de la programación del gym (RF-23). */
+    val finProgramacionGym: Flow<LocalDate?> = datos.data.map { p -> p[FIN_GYM]?.let(LocalDate::parse) }
+
+    suspend fun guardarFinProgramacionGym(fecha: LocalDate?) {
+        datos.edit { if (fecha == null) it.remove(FIN_GYM) else it[FIN_GYM] = fecha.toString() }
     }
 
     val respaldo: Flow<AjustesRespaldo> = datos.data.map { p ->
@@ -98,6 +111,8 @@ class AjustesRepository(private val datos: DataStore<Preferences>) {
             p[RESUMEN] = ajustes.resumen
             p[HORA_RESUMEN] = ajustes.horaResumen.toString()
             p[PRIORIDAD_ALARMA] = ajustes.prioridadAlarma
+            p[AVISO_GYM] = ajustes.gym
+            p[MINUTOS_GYM] = ajustes.minutosGym
         }
     }
 
@@ -137,6 +152,9 @@ class AjustesRepository(private val datos: DataStore<Preferences>) {
         val PASOS_GUIA_HECHOS = stringSetPreferencesKey("pasos_guia_hechos")
         val CODIGOS_PROGRAMADOS = stringSetPreferencesKey("codigos_programados")
         val ULTIMA_COMPROBACION = longPreferencesKey("ultima_comprobacion")
+        val AVISO_GYM = booleanPreferencesKey("avisos_gym")
+        val MINUTOS_GYM = intPreferencesKey("avisos_minutos_gym")
+        val FIN_GYM = stringPreferencesKey("fin_programacion_gym")
         val CARPETA_RESPALDOS = stringPreferencesKey("carpeta_respaldos")
         val ULTIMO_RESPALDO = longPreferencesKey("ultimo_respaldo")
         val RESPALDO_AUTOMATICO = booleanPreferencesKey("respaldo_automatico")

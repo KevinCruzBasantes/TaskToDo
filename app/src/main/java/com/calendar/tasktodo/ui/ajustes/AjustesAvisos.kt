@@ -140,6 +140,11 @@ fun AjustesAvisosScreen(
                 Selector("Minutos antes", listOf(5, 10, 15, 30), a.minutosClase, { "$it min" }) { m -> viewModel.cambiar { it.copy(minutosClase = m) } }
             }
             HorizontalDivider(Modifier.padding(top = 16.dp))
+            Interruptor("Gym", "${a.minutosGym} minutos antes de cada sesión, con el nombre de la rutina", a.gym) { v -> viewModel.cambiar { it.copy(gym = v) } }
+            if (a.gym) {
+                Selector("Minutos antes", listOf(5, 10, 15, 30, 60), a.minutosGym, { "$it min" }) { m -> viewModel.cambiar { it.copy(minutosGym = m) } }
+            }
+            HorizontalDivider(Modifier.padding(top = 16.dp))
             Interruptor("Resumen del día", "Lo de hoy y las tareas atrasadas", a.resumen) { v -> viewModel.cambiar { it.copy(resumen = v) } }
             if (a.resumen) {
                 CampoHora("Hora", a.horaResumen, formatoHora, { h -> viewModel.cambiar { it.copy(horaResumen = h) } }, Modifier.padding(horizontal = 16.dp))

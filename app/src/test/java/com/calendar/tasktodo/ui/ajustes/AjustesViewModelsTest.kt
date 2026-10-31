@@ -104,6 +104,7 @@ class AjustesViewModelsTest {
             override fun clase(clase: ClaseConMateria) = Unit
             override fun resumen(delDia: List<ActividadConMateria>, atrasadas: List<ActividadConMateria>) = Unit
             override fun cerrarActividad(id: Long) = Unit
+            override fun finDescanso(sesion: com.calendar.tasktodo.data.db.entidad.SesionGym) = Unit
         }
         fun comprobacion(reloj: Clock) = PendientesAlAbrir(
             ajustes.repositorio,

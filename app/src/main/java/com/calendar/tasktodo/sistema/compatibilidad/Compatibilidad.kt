@@ -11,6 +11,7 @@ import android.os.PowerManager
 import android.provider.Settings
 import androidx.core.app.NotificationManagerCompat
 import com.calendar.tasktodo.data.ajustes.AjustesRepository
+import com.calendar.tasktodo.data.repositorio.GymRepository
 import com.calendar.tasktodo.data.respaldo.RespaldoRepository
 import com.calendar.tasktodo.sistema.avisos.ServicioAvisos
 import java.time.Clock
@@ -101,11 +102,14 @@ class PendientesAlAbrir(
     private val avisos: ServicioAvisos,
     private val reloj: Clock,
     private val respaldo: RespaldoRepository? = null,
+    private val gym: GymRepository? = null,
 ) {
     suspend fun ejecutar() {
         val ahora = Instant.now(reloj)
         val ultima = ajustes.ultimaComprobacion()
         if (ultima != null && Duration.between(ultima, ahora) < INTERVALO) return
+        // Extiende la ventana del gym antes de reprogramar, para que sus avisos entren (diagramas §6)
+        gym?.generar()
         avisos.reprogramarTodo()
         respaldo?.ponerAlDia()
         ajustes.guardarUltimaComprobacion(ahora)

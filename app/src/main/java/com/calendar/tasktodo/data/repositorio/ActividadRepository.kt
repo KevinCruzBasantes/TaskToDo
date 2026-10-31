@@ -50,6 +50,12 @@ class ActividadRepository(
         observador.huboCambios()
     }
 
+    /** Saltar una sesión de gym: no cuenta como planificada y su aviso se cancela (CU-15 2a). */
+    suspend fun saltar(id: Long) {
+        dao.cambiarEstado(id, EstadoActividad.SALTADA)
+        observador.huboCambios()
+    }
+
     /** Reprogramar una tarea atrasada; solo hoy o después (CU-09). */
     suspend fun reprogramar(id: Long, fecha: LocalDate, hoy: LocalDate) {
         require(!fecha.isBefore(hoy)) { "Solo se puede reprogramar para hoy o una fecha futura" }

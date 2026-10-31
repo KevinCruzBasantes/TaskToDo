@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
@@ -38,11 +39,19 @@ import androidx.navigation.toRoute
 import com.calendar.tasktodo.ui.actividades.ActividadesScreen
 import com.calendar.tasktodo.ui.actividades.DetalleActividadScreen
 import com.calendar.tasktodo.ui.actividades.FormActividadScreen
+import com.calendar.tasktodo.Pedido
 import com.calendar.tasktodo.ui.ajustes.AjustesAvisosScreen
 import com.calendar.tasktodo.ui.ajustes.AjustesScreen
 import com.calendar.tasktodo.ui.ajustes.GuiaMiuiScreen
 import com.calendar.tasktodo.ui.ajustes.RespaldoScreen
 import com.calendar.tasktodo.ui.dia.DiaScreen
+import com.calendar.tasktodo.ui.gym.DetalleRutinaScreen
+import com.calendar.tasktodo.ui.gym.FormEjercicioScreen
+import com.calendar.tasktodo.ui.gym.FormRutinaScreen
+import com.calendar.tasktodo.ui.gym.GymScreen
+import com.calendar.tasktodo.ui.gym.ProgramacionScreen
+import com.calendar.tasktodo.ui.gym.RutinasScreen
+import com.calendar.tasktodo.ui.gym.SesionScreen
 import com.calendar.tasktodo.ui.horario.DetalleClaseScreen
 import com.calendar.tasktodo.ui.horario.FormClaseScreen
 import com.calendar.tasktodo.ui.horario.FormMateriaScreen
@@ -54,11 +63,12 @@ import java.time.LocalDate
 
 private data class Seccion(val ruta: Any, val etiqueta: String, val icono: ImageVector)
 
-/** Hasta el incremento 4 la barra tiene Hoy, Calendario, Actividades y Ajustes; Gym llega en el 5 (diseño de interfaz §2). */
+/** Barra inferior con las cinco secciones (diseño de interfaz §2). */
 private val SECCIONES = listOf(
     Seccion(Dia(), "Hoy", Icons.Filled.Home),
     Seccion(Calendario, "Calendario", Icons.Filled.DateRange),
     Seccion(Actividades, "Actividades", Icons.AutoMirrored.Filled.List),
+    Seccion(Gym, "Gym", Icons.Filled.Favorite),
     Seccion(Ajustes, "Ajustes", Icons.Filled.Settings),
 )
 
@@ -77,18 +87,18 @@ private fun NavController.volverDesde(entrada: NavBackStackEntry) {
 }
 
 /**
- * @param actividadPedida actividad que pidió abrir una notificación o la alarma de la pantalla de
- * bloqueo; se abre su detalle y se avisa con [onPedidoAtendido].
+ * @param pedido lo que pidió abrir una notificación o la alarma de la pantalla de bloqueo; se abre
+ * y se avisa con [onPedidoAtendido].
  */
 @Composable
 fun AgendaApp(
-    actividadPedida: StateFlow<Long?>,
+    pedido: StateFlow<Pedido?>,
     onPedidoAtendido: () -> Unit,
     viewModel: AppViewModel = viewModel(factory = AppViewModel.Factory),
 ) {
     val destinoInicial by viewModel.destinoInicial.collectAsStateWithLifecycle()
     val mostrarGuiaMiui by viewModel.mostrarGuiaMiui.collectAsStateWithLifecycle()
-    val pedida by actividadPedida.collectAsStateWithLifecycle()
+    val pedida by pedido.collectAsStateWithLifecycle()
     PedirPermisoNotificaciones()
     val inicio = destinoInicial ?: return
 
@@ -97,9 +107,12 @@ fun AgendaApp(
     val destino = entradaActual?.destination
 
     LaunchedEffect(pedida, entradaActual != null) {
-        val id = pedida ?: return@LaunchedEffect
+        val abrir = pedida ?: return@LaunchedEffect
         if (entradaActual == null) return@LaunchedEffect
-        nav.navigate(DetalleActividad(id)) { launchSingleTop = true }
+        when (abrir) {
+            is Pedido.Actividad -> nav.navigate(DetalleActividad(abrir.id)) { launchSingleTop = true }
+            is Pedido.Sesion -> nav.navigate(Sesion(abrir.actividadId)) { launchSingleTop = true }
+        }
         onPedidoAtendido()
     }
 
@@ -139,6 +152,7 @@ fun AgendaApp(
                     onAbrirClase = { nav.navigate(DetalleClase(it)) },
                     onAbrirActividad = { nav.navigate(DetalleActividad(it)) },
                     onNuevaActividad = { nav.navigate(FormActividad(fecha = it.toString())) },
+                    onAbrirSesion = { nav.navigate(Sesion(it)) },
                 )
             }
             composable<Calendario> {
@@ -156,6 +170,7 @@ fun AgendaApp(
                     onAbrirClase = { nav.navigate(DetalleClase(it)) },
                     onAbrirActividad = { nav.navigate(DetalleActividad(it)) },
                     onNuevaActividad = { nav.navigate(FormActividad(fecha = it.toString())) },
+                    onAbrirSesion = { nav.navigate(Sesion(it)) },
                     onAtras = { nav.volverDesde(entrada) },
                 )
             }
@@ -213,7 +228,56 @@ fun AgendaApp(
                     id = entrada.toRoute<DetalleActividad>().id,
                     onAtras = { nav.volverDesde(entrada) },
                     onEditar = { nav.navigate(FormActividad(id = it)) },
+                    onAbrirSesion = { nav.navigate(Sesion(it)) },
                 )
+            }
+            composable<Gym> {
+                GymScreen(
+                    onAbrirSesion = { nav.navigate(Sesion(it)) },
+                    onRutinas = { nav.navigate(Rutinas) },
+                    onProgramacion = { nav.navigate(Programacion) },
+                )
+            }
+            composable<Rutinas> { entrada ->
+                RutinasScreen(
+                    onAtras = { nav.volverDesde(entrada) },
+                    onAbrir = { nav.navigate(DetalleRutina(it)) },
+                    onNueva = { nav.navigate(FormRutina()) },
+                )
+            }
+            composable<FormRutina> { entrada ->
+                FormRutinaScreen(
+                    id = entrada.toRoute<FormRutina>().id,
+                    onCerrar = { nav.volverDesde(entrada) },
+                    onGuardada = { id, eraEdicion ->
+                        // Una rutina nueva sigue a su detalle para agregarle ejercicios (CU-12 6 y 7)
+                        if (eraEdicion) {
+                            nav.volverDesde(entrada)
+                        } else {
+                            nav.navigate(DetalleRutina(id)) { popUpTo<FormRutina> { inclusive = true } }
+                        }
+                    },
+                )
+            }
+            composable<DetalleRutina> { entrada ->
+                val id = entrada.toRoute<DetalleRutina>().id
+                DetalleRutinaScreen(
+                    id = id,
+                    onAtras = { nav.volverDesde(entrada) },
+                    onEditarRutina = { nav.navigate(FormRutina(id)) },
+                    onNuevoEjercicio = { nav.navigate(FormEjercicio(id)) },
+                    onEditarEjercicio = { nav.navigate(FormEjercicio(id, it)) },
+                )
+            }
+            composable<FormEjercicio> { entrada ->
+                val ruta = entrada.toRoute<FormEjercicio>()
+                FormEjercicioScreen(rutinaId = ruta.rutinaId, id = ruta.id, onCerrar = { nav.volverDesde(entrada) })
+            }
+            composable<Programacion> { entrada ->
+                ProgramacionScreen(onAtras = { nav.volverDesde(entrada) }, onCrearRutina = { nav.navigate(FormRutina()) })
+            }
+            composable<Sesion> { entrada ->
+                SesionScreen(actividadId = entrada.toRoute<Sesion>().actividadId, onAtras = { nav.volverDesde(entrada) })
             }
             composable<AjustesAvisos> { entrada -> AjustesAvisosScreen(onAtras = { nav.volverDesde(entrada) }) }
             composable<GuiaMiui> { entrada -> GuiaMiuiScreen(onTerminar = { nav.volverDesde(entrada) }) }

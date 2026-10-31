@@ -1,0 +1,732 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 3,
+    "identityHash": "0244f3c55b3921015ddea7362e4b33ad",
+    "entities": [
+      {
+        "tableName": "materia",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `nombre` TEXT NOT NULL COLLATE NOCASE, `color` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nombre",
+            "columnName": "nombre",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "color",
+            "columnName": "color",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_materia_nombre",
+            "unique": true,
+            "columnNames": [
+              "nombre"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_materia_nombre` ON `${TABLE_NAME}` (`nombre`)"
+          }
+        ]
+      },
+      {
+        "tableName": "clase",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `materia_id` INTEGER NOT NULL, `dia_semana` INTEGER NOT NULL, `hora_inicio` TEXT NOT NULL, `hora_fin` TEXT NOT NULL, `aula` TEXT, FOREIGN KEY(`materia_id`) REFERENCES `materia`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "materiaId",
+            "columnName": "materia_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "diaSemana",
+            "columnName": "dia_semana",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "horaInicio",
+            "columnName": "hora_inicio",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "horaFin",
+            "columnName": "hora_fin",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "aula",
+            "columnName": "aula",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_clase_materia_id",
+            "unique": false,
+            "columnNames": [
+              "materia_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_clase_materia_id` ON `${TABLE_NAME}` (`materia_id`)"
+          },
+          {
+            "name": "index_clase_dia_semana",
+            "unique": false,
+            "columnNames": [
+              "dia_semana"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_clase_dia_semana` ON `${TABLE_NAME}` (`dia_semana`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "materia",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "materia_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "actividad",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `titulo` TEXT NOT NULL, `tipo` TEXT NOT NULL, `fecha` TEXT NOT NULL, `hora` TEXT, `materia_id` INTEGER, `notas` TEXT, `aviso_minutos_antes` INTEGER, `estado` TEXT NOT NULL, `rutina_id` INTEGER, `dia_gym_id` INTEGER, `fecha_programada` TEXT, FOREIGN KEY(`materia_id`) REFERENCES `materia`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL , FOREIGN KEY(`rutina_id`) REFERENCES `rutina`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL , FOREIGN KEY(`dia_gym_id`) REFERENCES `dia_gym`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "titulo",
+            "columnName": "titulo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tipo",
+            "columnName": "tipo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fecha",
+            "columnName": "fecha",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hora",
+            "columnName": "hora",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "materiaId",
+            "columnName": "materia_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "notas",
+            "columnName": "notas",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "avisoMinutosAntes",
+            "columnName": "aviso_minutos_antes",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "estado",
+            "columnName": "estado",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rutinaId",
+            "columnName": "rutina_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "diaGymId",
+            "columnName": "dia_gym_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "fechaProgramada",
+            "columnName": "fecha_programada",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_actividad_fecha",
+            "unique": false,
+            "columnNames": [
+              "fecha"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_actividad_fecha` ON `${TABLE_NAME}` (`fecha`)"
+          },
+          {
+            "name": "index_actividad_materia_id",
+            "unique": false,
+            "columnNames": [
+              "materia_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_actividad_materia_id` ON `${TABLE_NAME}` (`materia_id`)"
+          },
+          {
+            "name": "index_actividad_rutina_id",
+            "unique": false,
+            "columnNames": [
+              "rutina_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_actividad_rutina_id` ON `${TABLE_NAME}` (`rutina_id`)"
+          },
+          {
+            "name": "index_actividad_dia_gym_id_fecha_programada",
+            "unique": true,
+            "columnNames": [
+              "dia_gym_id",
+              "fecha_programada"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_actividad_dia_gym_id_fecha_programada` ON `${TABLE_NAME}` (`dia_gym_id`, `fecha_programada`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "materia",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "materia_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "rutina",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "rutina_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "dia_gym",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "dia_gym_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "rutina",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `nombre` TEXT NOT NULL COLLATE NOCASE, `descanso_entre_ejercicios_seg` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nombre",
+            "columnName": "nombre",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "descansoEntreEjerciciosSeg",
+            "columnName": "descanso_entre_ejercicios_seg",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_rutina_nombre",
+            "unique": true,
+            "columnNames": [
+              "nombre"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_rutina_nombre` ON `${TABLE_NAME}` (`nombre`)"
+          }
+        ]
+      },
+      {
+        "tableName": "ejercicio",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `rutina_id` INTEGER NOT NULL, `orden` INTEGER NOT NULL, `nombre` TEXT NOT NULL, `medida` TEXT NOT NULL, `series` INTEGER NOT NULL, `repeticiones` INTEGER, `duracion_seg` INTEGER, `peso_kg` REAL, `descanso_series_seg` INTEGER, `descanso_tras_ejercicio_seg` INTEGER, `nota` TEXT, FOREIGN KEY(`rutina_id`) REFERENCES `rutina`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rutinaId",
+            "columnName": "rutina_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "orden",
+            "columnName": "orden",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nombre",
+            "columnName": "nombre",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "medida",
+            "columnName": "medida",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "series",
+            "columnName": "series",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "repeticiones",
+            "columnName": "repeticiones",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "duracionSeg",
+            "columnName": "duracion_seg",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "pesoKg",
+            "columnName": "peso_kg",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "descansoSeriesSeg",
+            "columnName": "descanso_series_seg",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "descansoTrasEjercicioSeg",
+            "columnName": "descanso_tras_ejercicio_seg",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "nota",
+            "columnName": "nota",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_ejercicio_rutina_id_orden",
+            "unique": false,
+            "columnNames": [
+              "rutina_id",
+              "orden"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ejercicio_rutina_id_orden` ON `${TABLE_NAME}` (`rutina_id`, `orden`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "rutina",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "rutina_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "dia_gym",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `dia_semana` INTEGER NOT NULL, `hora` TEXT NOT NULL, `rutina_id` INTEGER NOT NULL, FOREIGN KEY(`rutina_id`) REFERENCES `rutina`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "diaSemana",
+            "columnName": "dia_semana",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hora",
+            "columnName": "hora",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rutinaId",
+            "columnName": "rutina_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_dia_gym_dia_semana",
+            "unique": true,
+            "columnNames": [
+              "dia_semana"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_dia_gym_dia_semana` ON `${TABLE_NAME}` (`dia_semana`)"
+          },
+          {
+            "name": "index_dia_gym_rutina_id",
+            "unique": false,
+            "columnNames": [
+              "rutina_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_dia_gym_rutina_id` ON `${TABLE_NAME}` (`rutina_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "rutina",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "rutina_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "sesion_gym",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `actividad_id` INTEGER, `rutina_id` INTEGER, `nombre_rutina` TEXT NOT NULL, `fecha` TEXT NOT NULL, `inicio` INTEGER NOT NULL, `fin` INTEGER, `duracion_seg` INTEGER, `estado` TEXT NOT NULL, `descanso_termina_en` INTEGER, `orden_ejercicios` TEXT NOT NULL, FOREIGN KEY(`actividad_id`) REFERENCES `actividad`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL , FOREIGN KEY(`rutina_id`) REFERENCES `rutina`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "actividadId",
+            "columnName": "actividad_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "rutinaId",
+            "columnName": "rutina_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "nombreRutina",
+            "columnName": "nombre_rutina",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fecha",
+            "columnName": "fecha",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "inicio",
+            "columnName": "inicio",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fin",
+            "columnName": "fin",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "duracionSeg",
+            "columnName": "duracion_seg",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "estado",
+            "columnName": "estado",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "descansoTerminaEn",
+            "columnName": "descanso_termina_en",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "ordenEjercicios",
+            "columnName": "orden_ejercicios",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_sesion_gym_actividad_id",
+            "unique": true,
+            "columnNames": [
+              "actividad_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_sesion_gym_actividad_id` ON `${TABLE_NAME}` (`actividad_id`)"
+          },
+          {
+            "name": "index_sesion_gym_rutina_id",
+            "unique": false,
+            "columnNames": [
+              "rutina_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_sesion_gym_rutina_id` ON `${TABLE_NAME}` (`rutina_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "actividad",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "actividad_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "rutina",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "rutina_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "serie_realizada",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `sesion_id` INTEGER NOT NULL, `ejercicio_id` INTEGER, `nombre_ejercicio` TEXT NOT NULL, `orden_ejercicio` INTEGER NOT NULL, `numero_serie` INTEGER NOT NULL, `medida` TEXT NOT NULL, `repeticiones` INTEGER, `duracion_seg` INTEGER, `peso_kg` REAL, `completada_en` INTEGER NOT NULL, FOREIGN KEY(`sesion_id`) REFERENCES `sesion_gym`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`ejercicio_id`) REFERENCES `ejercicio`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sesionId",
+            "columnName": "sesion_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ejercicioId",
+            "columnName": "ejercicio_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "nombreEjercicio",
+            "columnName": "nombre_ejercicio",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ordenEjercicio",
+            "columnName": "orden_ejercicio",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "numeroSerie",
+            "columnName": "numero_serie",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "medida",
+            "columnName": "medida",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "repeticiones",
+            "columnName": "repeticiones",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "duracionSeg",
+            "columnName": "duracion_seg",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "pesoKg",
+            "columnName": "peso_kg",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "completadaEn",
+            "columnName": "completada_en",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_serie_realizada_sesion_id",
+            "unique": false,
+            "columnNames": [
+              "sesion_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_serie_realizada_sesion_id` ON `${TABLE_NAME}` (`sesion_id`)"
+          },
+          {
+            "name": "index_serie_realizada_ejercicio_id",
+            "unique": false,
+            "columnNames": [
+              "ejercicio_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_serie_realizada_ejercicio_id` ON `${TABLE_NAME}` (`ejercicio_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "sesion_gym",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "sesion_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "ejercicio",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "ejercicio_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0244f3c55b3921015ddea7362e4b33ad')"
+    ]
+  }
+}
