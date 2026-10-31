@@ -1,0 +1,11 @@
+* text=auto
+
+# Scripts: cada uno con el final de línea de su sistema
+gradlew text eol=lf
+*.sh text eol=lf
+*.bat text eol=crlf
+
+# Binarios
+*.jar binary
+*.png binary
+*.webp binary
