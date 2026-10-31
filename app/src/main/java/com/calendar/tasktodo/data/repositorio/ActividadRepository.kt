@@ -16,6 +16,8 @@ class ActividadRepository(
 
     fun delDia(fecha: LocalDate): Flow<List<ActividadConMateria>> = dao.observarDelDia(fecha)
 
+    fun entre(desde: LocalDate, hasta: LocalDate): Flow<List<ActividadConMateria>> = dao.observarEntre(desde, hasta)
+
     fun atrasadas(hoy: LocalDate): Flow<List<ActividadConMateria>> = dao.observarAtrasadas(hoy)
 
     fun actividad(id: Long): Flow<ActividadConMateria?> = dao.observar(id)

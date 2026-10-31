@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
@@ -53,6 +54,8 @@ fun DiaScreen(
     onAbrirClase: (Long) -> Unit,
     onAbrirActividad: (Long) -> Unit,
     onNuevaActividad: (LocalDate) -> Unit,
+    /** Al abrirse desde la semana (RF-36): flecha para volver y sin barra inferior. */
+    onAtras: (() -> Unit)? = null,
     viewModel: DiaViewModel = viewModel(factory = DiaViewModel.factory(fechaInicial)),
 ) {
     val estado by viewModel.estado.collectAsStateWithLifecycle()
@@ -62,7 +65,7 @@ fun DiaScreen(
     var borrando by rememberSaveable { mutableStateOf<Long?>(null) }
 
     Pantalla(
-        enBarra = true,
+        enBarra = onAtras == null,
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
@@ -74,12 +77,21 @@ fun DiaScreen(
                     }
                 },
                 navigationIcon = {
-                    IconButton(onClick = viewModel::anterior) {
-                        Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Día anterior")
+                    if (onAtras != null) {
+                        IconButton(onClick = onAtras) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás") }
+                    } else {
+                        IconButton(onClick = viewModel::anterior) {
+                            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Día anterior")
+                        }
                     }
                 },
                 actions = {
-                    if (!estado.esHoy) TextButton(onClick = viewModel::irAHoy) { Text("Hoy") }
+                    if (onAtras != null) {
+                        IconButton(onClick = viewModel::anterior) {
+                            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Día anterior")
+                        }
+                    }
+                    if (!estado.esHoy && onAtras == null) TextButton(onClick = viewModel::irAHoy) { Text("Hoy") }
                     IconButton(onClick = { eligiendoFecha = true }) {
                         Icon(Icons.Filled.DateRange, contentDescription = "Elegir fecha")
                     }

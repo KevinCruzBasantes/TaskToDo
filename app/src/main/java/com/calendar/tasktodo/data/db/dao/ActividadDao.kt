@@ -29,6 +29,10 @@ interface ActividadDao {
     @Query("$ACTIVIDAD_CON_MATERIA WHERE actividad.tipo = 'TAREA' AND actividad.estado = 'PENDIENTE' AND actividad.fecha < :hoy $ORDEN")
     fun observarAtrasadas(hoy: LocalDate): Flow<List<ActividadConMateria>>
 
+    /** Para las vistas de semana y mes (RF-34, RF-35). */
+    @Query("$ACTIVIDAD_CON_MATERIA WHERE actividad.fecha BETWEEN :desde AND :hasta $ORDEN")
+    fun observarEntre(desde: LocalDate, hasta: LocalDate): Flow<List<ActividadConMateria>>
+
     @Query("$ACTIVIDAD_CON_MATERIA $ORDEN")
     fun observarTodas(): Flow<List<ActividadConMateria>>
 

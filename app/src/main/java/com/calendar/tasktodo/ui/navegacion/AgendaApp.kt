@@ -46,7 +46,7 @@ import com.calendar.tasktodo.ui.dia.DiaScreen
 import com.calendar.tasktodo.ui.horario.DetalleClaseScreen
 import com.calendar.tasktodo.ui.horario.FormClaseScreen
 import com.calendar.tasktodo.ui.horario.FormMateriaScreen
-import com.calendar.tasktodo.ui.horario.HorarioScreen
+import com.calendar.tasktodo.ui.calendario.CalendarioScreen
 import com.calendar.tasktodo.ui.horario.MateriasScreen
 import com.calendar.tasktodo.ui.inicio.BienvenidaScreen
 import kotlinx.coroutines.flow.StateFlow
@@ -54,7 +54,7 @@ import java.time.LocalDate
 
 private data class Seccion(val ruta: Any, val etiqueta: String, val icono: ImageVector)
 
-/** En el incremento 2 la barra tiene Hoy, Calendario, Actividades y Ajustes (diseño de interfaz §2). */
+/** Hasta el incremento 4 la barra tiene Hoy, Calendario, Actividades y Ajustes; Gym llega en el 5 (diseño de interfaz §2). */
 private val SECCIONES = listOf(
     Seccion(Dia(), "Hoy", Icons.Filled.Home),
     Seccion(Calendario, "Calendario", Icons.Filled.DateRange),
@@ -142,11 +142,21 @@ fun AgendaApp(
                 )
             }
             composable<Calendario> {
-                HorarioScreen(
+                CalendarioScreen(
+                    onAbrirDia = { nav.navigate(DiaDesdeCalendario(it.toString())) },
                     onAbrirClase = { nav.navigate(DetalleClase(it)) },
                     onNuevaClase = { nav.navigate(FormClase()) },
                     onNuevaMateria = { nav.navigate(FormMateria()) },
                     onMaterias = { nav.navigate(Materias) },
+                )
+            }
+            composable<DiaDesdeCalendario> { entrada ->
+                DiaScreen(
+                    fechaInicial = LocalDate.parse(entrada.toRoute<DiaDesdeCalendario>().fecha),
+                    onAbrirClase = { nav.navigate(DetalleClase(it)) },
+                    onAbrirActividad = { nav.navigate(DetalleActividad(it)) },
+                    onNuevaActividad = { nav.navigate(FormActividad(fecha = it.toString())) },
+                    onAtras = { nav.volverDesde(entrada) },
                 )
             }
             composable<Actividades> {

@@ -47,3 +47,7 @@ data object GuiaMiui
 /** Desde la bienvenida, al restaurar se va directo al día (CU-01 2a). */
 @Serializable
 data class Respaldo(val desdeBienvenida: Boolean = false)
+
+/** Un día abierto desde la semana del calendario (RF-36); vuelve al calendario con atrás. */
+@Serializable
+data class DiaDesdeCalendario(val fecha: String)

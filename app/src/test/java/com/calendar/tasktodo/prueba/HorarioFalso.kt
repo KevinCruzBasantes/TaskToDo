@@ -148,6 +148,9 @@ class HorarioFalso {
     val actividadDao = object : ActividadDao {
         override fun observarDelDia(fecha: LocalDate) = actividadesUnidas { it.fecha == fecha }
 
+        override fun observarEntre(desde: LocalDate, hasta: LocalDate) =
+            actividadesUnidas { !it.fecha.isBefore(desde) && !it.fecha.isAfter(hasta) }
+
         override fun observarAtrasadas(hoy: LocalDate) = actividadesUnidas { esAtrasada(it, hoy) }
 
         override fun observarTodas() = actividadesUnidas { true }

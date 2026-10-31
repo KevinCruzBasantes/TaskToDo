@@ -79,10 +79,10 @@ La matriz conecta cada requerimiento con su caso de uso, los datos que usa, las 
 
 | RF | Resumen | CU | Datos | Pantallas | Pruebas | Inc. | Verificado |
 |---|---|---|---|---|---|---|---|
-| RF-34 | Vista de semana | CU-11 | `clase`, `actividad` | Semana | CP-4.01, CP-4.05 | 4 | — |
-| RF-35 | Vista de mes | CU-11 | `actividad` | Mes | CP-4.02 | 4 | — |
-| RF-36 | Mes → semana → día | CU-11 | — | Mes, Semana, Hoy | CP-4.03 | 4 | — |
-| RF-37 | Señal de días pasados sin check | CU-11 | `actividad` | Semana, Mes | CP-4.04 | 4 | — |
+| RF-34 | Vista de semana | CU-11 | `clase`, `actividad` | Semana | CP-4.01, CP-4.05 | 4 | 2026-10-31 · 4.0 |
+| RF-35 | Vista de mes | CU-11 | `actividad` | Mes | CP-4.02 | 4 | 2026-10-31 · 4.0 |
+| RF-36 | Mes → semana → día | CU-11 | — | Mes, Semana, Hoy | CP-4.03 | 4 | 2026-10-31 · 4.0 |
+| RF-37 | Señal de días pasados sin check | CU-11 | `actividad` | Semana, Mes | CP-4.04 | 4 | 2026-10-31 · 4.0 |
 
 ### 1.6 Notificaciones
 

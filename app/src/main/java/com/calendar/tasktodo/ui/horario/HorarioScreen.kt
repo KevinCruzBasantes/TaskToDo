@@ -1,59 +1,44 @@
 package com.calendar.tasktodo.ui.horario
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.calendar.tasktodo.ui.componentes.EstadoVacio
 import com.calendar.tasktodo.ui.componentes.FilaClase
-import com.calendar.tasktodo.ui.componentes.Pantalla
 import com.calendar.tasktodo.ui.nombre
 import com.calendar.tasktodo.ui.rememberFormatoHora
 
-/** Pestaña Calendario. En el incremento 1 solo muestra el horario semanal (CU-05). */
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Pestaña Horario de Calendario (CU-05): la plantilla de clases de lunes a domingo, sin fechas.
+ * La barra superior y las pestañas las pone el Calendario.
+ */
 @Composable
-fun HorarioScreen(
+fun HorarioContenido(
     onAbrirClase: (Long) -> Unit,
     onNuevaClase: () -> Unit,
     onNuevaMateria: () -> Unit,
-    onMaterias: () -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: HorarioViewModel = viewModel(factory = HorarioViewModel.Factory),
 ) {
     val estado by viewModel.estado.collectAsStateWithLifecycle()
     val formatoHora = rememberFormatoHora()
 
-    Pantalla(
-        enBarra = true,
-        topBar = {
-            TopAppBar(
-                title = { Text("Horario") },
-                actions = { TextButton(onClick = onMaterias) { Text("Materias") } },
-            )
-        },
-        floatingActionButton = {
-            if (estado.hayMaterias) {
-                FloatingActionButton(onClick = onNuevaClase) {
-                    Icon(Icons.Filled.Add, contentDescription = "Agregar clase")
-                }
-            }
-        },
-    ) { modifier ->
+    Box(modifier.fillMaxSize()) {
         when {
             estado.cargando -> Unit
             !estado.hayMaterias -> EstadoVacio(
@@ -61,15 +46,13 @@ fun HorarioScreen(
                 detalle = "Cada clase pertenece a una materia.",
                 accion = "Agregar materia",
                 onAccion = onNuevaMateria,
-                modifier = modifier,
             )
             estado.dias.isEmpty() -> EstadoVacio(
                 mensaje = "Aún no tienes clases",
                 accion = "Agregar clase",
                 onAccion = onNuevaClase,
-                modifier = modifier,
             )
-            else -> LazyColumn(modifier.fillMaxSize()) {
+            else -> LazyColumn(Modifier.fillMaxSize()) {
                 estado.dias.forEach { (dia, clases) ->
                     item(key = dia) {
                         Text(
@@ -83,6 +66,16 @@ fun HorarioScreen(
                         FilaClase(clase, formatoHora, onClick = { onAbrirClase(clase.clase.id) })
                     }
                 }
+            }
+        }
+        if (estado.hayMaterias) {
+            FloatingActionButton(
+                onClick = onNuevaClase,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp),
+            ) {
+                Icon(Icons.Filled.Add, contentDescription = "Agregar clase")
             }
         }
     }

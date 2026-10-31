@@ -104,8 +104,9 @@ flowchart TB
 | Ajustes y avisos | `Ajustes`, `AjustesAvisos` | CU-19 | 2 |
 | Guía de MIUI | `GuiaMiui` | CU-01, CU-19 | 2 |
 | Respaldo | `AjustesRespaldo` | CU-21, CU-22, CU-23 | 3 |
-| Semana | `Semana(fecha)` | CU-11 | 4 |
-| Mes | `Mes(anio, mes)` | CU-11 | 4 |
+| Semana | Pestaña de `Calendario` | CU-11 | 4 |
+| Mes | Pestaña de `Calendario` | CU-11 | 4 |
+| Día abierto desde la semana | `DiaDesdeCalendario(fecha)` | CU-10, CU-11 | 4 |
 | Gym (inicio) | `Gym` | — | 5 |
 | Rutinas | `Rutinas` | CU-12 | 5 |
 | Detalle de rutina | `DetalleRutina(id)` | CU-12, CU-13 | 5 |
@@ -114,6 +115,8 @@ flowchart TB
 | Sesión de gym | `Sesion(actividadId)` | CU-16 | 5 |
 | Peso e IMC | `Peso` | CU-17 | 6 |
 | Estadísticas | `Estadisticas` | CU-18 | 6 |
+
+Semana, Mes y Horario son pestañas de una sola pantalla, `Calendario`, que tiene el botón "Materias" en su barra superior. Un día abierto desde la semana usa su propia ruta, `DiaDesdeCalendario`: muestra el módulo del día con una flecha para volver al calendario y sin barra inferior, para que el botón "Hoy" siempre vuelva al día actual.
 
 En el incremento 1, la barra inferior solo tiene **Hoy**, **Calendario** (con la pestaña Horario) y **Ajustes**. Las demás secciones aparecen con su incremento.
 
