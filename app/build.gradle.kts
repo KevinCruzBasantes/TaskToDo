@@ -1,6 +1,20 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+}
+
+// La firma vive fuera del proyecto: local.properties dice dónde está su archivo de propiedades.
+// Ver docs/03-arquitectura.md §5.3.
+val firma = Properties().apply {
+    val local = rootProject.file("local.properties")
+    if (local.exists()) {
+        val ruta = Properties().apply { local.inputStream().use { load(it) } }
+            .getProperty("keystoreProperties")
+        val archivo = ruta?.let { file(it) }
+        if (archivo != null && archivo.exists()) archivo.inputStream().use { load(it) }
+    }
 }
 
 android {
@@ -17,10 +31,30 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders["appLabel"] = "TaskToDo"
+    }
+
+    signingConfigs {
+        if (!firma.isEmpty) {
+            create("release") {
+                storeFile = file(firma.getProperty("storeFile"))
+                storePassword = firma.getProperty("storePassword")
+                keyAlias = firma.getProperty("keyAlias")
+                keyPassword = firma.getProperty("keyPassword")
+            }
+        }
     }
 
     buildTypes {
+        debug {
+            // Se instala al lado de la app real, con sus propios datos
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
+            manifestPlaceholders["appLabel"] = "TaskToDo (dev)"
+        }
         release {
+            // Sin la clave, el APK sale sin firmar y Android no lo instala encima de la app real
+            signingConfig = signingConfigs.findByName("release")
             optimization {
                 enable = true
                 packageScope = setOf("androidx.**", "kotlin.**", "kotlinx.**")

@@ -345,22 +345,31 @@ Cada versión nueva se instala **encima** de la anterior, nunca desinstalando, p
 | Condición | Cómo se cumple |
 |---|---|
 | **El mismo `applicationId`** | Siempre `com.calendar.tasktodo` para la app de uso diario. No se cambia nunca. |
-| **La misma clave de firma** | Una clave propia, `agenda-release.jks`, creada una vez con Android Studio (Build → Generate Signed App Bundle or APK). No se usa la clave de depuración, porque es distinta en cada computadora y se pierde al reinstalar Android Studio. |
+| **La misma clave de firma** | Una clave propia, `agenda-release.jks`, creada una sola vez el 31 de octubre de 2026. No se usa la clave de depuración, porque es distinta en cada computadora y se pierde al reinstalar Android Studio. |
 | **Un `versionCode` mayor que el instalado** | Sube en 1 con cada APK que se instala en el celular. Android no permite bajar de versión. |
 
 **La clave de firma**
 
-- **Dónde va:** el archivo `.jks` y sus contraseñas van **fuera del repositorio**. Las contraseñas se guardan en `keystore.properties`, que está en `.gitignore`, y `build.gradle.kts` las lee desde ahí en `signingConfigs`.
-- **Respaldo:** la clave se respalda en dos lugares, por ejemplo un USB y Google Drive. Si se pierde, ninguna versión futura podrá instalarse encima y habrá que desinstalar, después de un respaldo de datos (CU-21) para restaurarlo luego.
+- **Dónde está:** todo lo de la firma vive en una sola carpeta, `E:\ClaveTaskToDo`, **fuera del proyecto y de git**:
+
+  | Archivo | Contenido |
+  |---|---|
+  | `agenda-release.jks` | La clave: PKCS12, RSA de 4096 bits, alias `tasktodo`, válida por 10 000 días (hasta 2054). |
+  | `keystore.properties` | La ruta de la clave, el alias y la contraseña. |
+
+- **Cómo la encuentra Gradle:** `local.properties`, que es propio de cada PC y está en `.gitignore`, tiene la línea `keystoreProperties=E\:/ClaveTaskToDo/keystore.properties`. `app/build.gradle.kts` lee ese archivo y arma `signingConfigs.release`. El repositorio no contiene ni la clave, ni la contraseña, ni la ruta.
+- **Si falta la clave,** por ejemplo en otra PC, la variante `debug` compila igual y la `release` sale sin firmar. Android no instala un APK sin firmar, así que nunca reemplaza por error a la app real.
+- **Huella de la clave (SHA-256):** `72:27:D6:78:51:B4:4F:12:42:F7:1C:DE:83:9F:DD:4D:F2:67:7B:80:8C:30:31:29:85:91:29:E5:41:BE:08:5C`. Sirve para comprobar que un APK se firmó con esta clave: `apksigner verify --print-certs app-release.apk`.
+- **Respaldo:** la carpeta `E:\ClaveTaskToDo` completa se copia a otro lugar fuera de la PC, como un USB. Si se pierde, ninguna versión futura podrá instalarse encima y habrá que desinstalar, después de un respaldo de datos (CU-21) para restaurarlo luego.
 
 **Dos variantes de la app**
 
 | Variante | `applicationId` | Nombre visible | Firma | Para qué |
 |---|---|---|---|---|
-| `release` | `com.calendar.tasktodo` | Agenda | `agenda-release.jks` | La app de uso diario, con tus datos reales. |
-| `debug` | `com.calendar.tasktodo.debug` | Agenda (dev) | Clave de depuración | Desarrollo y pruebas desde Android Studio. |
+| `release` | `com.calendar.tasktodo` | TaskToDo | `agenda-release.jks` | La app de uso diario, con tus datos reales. |
+| `debug` | `com.calendar.tasktodo.debug` | TaskToDo (dev) | Clave de depuración | Desarrollo y pruebas desde Android Studio. |
 
-Con `applicationIdSuffix = ".debug"`, la versión de desarrollo se instala **al lado** de la real y tiene su propia base de datos. Así, probar un incremento a medio hacer, o desinstalar la de desarrollo, nunca toca los datos reales.
+El nombre visible sale de `manifestPlaceholders["appLabel"]` en cada tipo de compilación. Con `applicationIdSuffix = ".debug"`, la versión de desarrollo se instala **al lado** de la real y tiene su propia base de datos. Así, probar un incremento a medio hacer, o desinstalar la de desarrollo, nunca toca los datos reales.
 
 **Números de versión**
 
@@ -373,7 +382,7 @@ Con `applicationIdSuffix = ".debug"`, la versión de desarrollo se instala **al 
 **Cómo instalar una versión nueva en el Xiaomi**
 
 1. Hacer un respaldo con "Respaldar ahora", por precaución.
-2. Generar el APK `release` firmado con `agenda-release.jks`.
+2. Generar el APK `release`: `./gradlew :app:assembleRelease`, o en Android Studio, Build → Generate App Bundles or APKs → Build APK(s) con la variante `release`. Sale en `app/build/outputs/apk/release/app-release.apk`, ya firmado.
 3. Instalarlo encima: `adb install -r app-release.apk`, o abrir el APK en el celular y tocar "Actualizar".
 4. Abrir la app y comprobar con la lista de humo (plan de pruebas §3.7) que los datos siguen ahí.
 

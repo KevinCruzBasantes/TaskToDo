@@ -107,7 +107,7 @@ Cada caso tiene un identificador `CP-<incremento>.<número>`, su tipo (U unitari
 | CP-1.13 | M | Instalar en el Xiaomi desde Android Studio. | La app se instala y abre; el tema no usa color dinámico. | RNF-01 |
 | CP-1.14 | U | Editar el horario de una clase y después eliminarla. | El cambio se ve en todas las semanas; al eliminarla, deja de aparecer en todas. | RF-07, CU-04 1b, 1c |
 | CP-1.15 | M | Generar el APK `release` firmado con `agenda-release.jks`, instalarlo y cargar materias. Después subir `versionCode`, generar otro APK e instalarlo encima con `adb install -r`. | Se instala sin pedir desinstalar y las materias siguen ahí. | RNF-04 |
-| CP-1.16 | M | Instalar la variante `debug` desde Android Studio con la `release` ya instalada. | Aparecen dos apps, "Agenda" y "Agenda (dev)", cada una con sus propios datos. | RNF-04 |
+| CP-1.16 | M | Instalar la variante `debug` desde Android Studio con la `release` ya instalada. | Aparecen dos apps, "TaskToDo" y "TaskToDo (dev)", cada una con sus propios datos. | RNF-04 |
 | CP-1.17 | M | Intentar instalar un APK firmado con la clave de depuración encima de la `release`. | Android lo rechaza (`INSTALL_FAILED_UPDATE_INCOMPATIBLE`) y los datos no se tocan. Confirma por qué no se debe aceptar desinstalar. | RNF-04 |
 | CP-1.18 | M | Intentar instalar un APK con un `versionCode` menor que el instalado. | Android lo rechaza (`INSTALL_FAILED_VERSION_DOWNGRADE`) y los datos no se tocan. | RNF-04 |
 
