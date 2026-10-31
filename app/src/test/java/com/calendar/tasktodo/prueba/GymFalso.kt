@@ -203,6 +203,13 @@ class GymFalso(private val actividades: MutableStateFlow<List<Actividad>>) : Gym
         rutinas.value = emptyList()
     }
 
+    override fun observarTerminadas() = sesiones.map { l -> l.filter { it.estado == EstadoSesion.TERMINADA }.sortedBy { it.inicio } }
+
+    override fun observarSeriesTerminadas() = combine(sesiones, series) { s, l ->
+        val terminadas = s.filter { it.estado == EstadoSesion.TERMINADA }.map { it.id }.toSet()
+        l.filter { it.sesionId in terminadas && it.ejercicioId != null }
+    }
+
     override suspend fun ultimaSerie(ejercicioId: Long, numero: Int): SerieRealizada? {
         val terminadas = sesiones.value.filter { it.estado == EstadoSesion.TERMINADA }.associateBy { it.id }
         return series.value

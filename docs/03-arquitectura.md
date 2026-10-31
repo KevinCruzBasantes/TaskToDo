@@ -338,7 +338,7 @@ Las versiones exactas se fijan en `gradle/libs.versions.toml` al empezar el incr
 | WorkManager (`work-runtime-ktx`) | Respaldo automático. El mantenimiento diario quedó como alarma (§4.2). | 3 | 2.11.2 |
 | DocumentFile (`documentfile`) | Crear, listar y borrar archivos en la carpeta de respaldos. | 3 | 1.1.0 |
 | Reorderable (`sh.calvin.reorderable`) | Arrastrar los bloques de ejercicios, en la rutina y durante la sesión (CU-13 2d, CU-16 9b). | 5 | 3.1.0 |
-| Vico (`compose-m3`) | Gráficas de estadísticas (CU-18). | 6 | Por fijar |
+| Vico (`compose-m3`) | Gráficas de estadísticas: barras de minutos y líneas de peso, IMC y fuerza (CU-18). | 6 | 2.2.1 (la 3.x está compilada con Kotlin 2.3 o 2.4, que Kotlin 2.2.10 no puede leer) |
 
 Pruebas: JUnit 4, `kotlinx-coroutines-test` 1.10.2, Turbine 1.2.1 (para probar `Flow`), `room-testing` (`MigrationTestHelper`), `work-testing` (incremento 3) y Compose UI Test.
 

@@ -367,7 +367,7 @@ Las consultas de lectura devuelven `Flow`, para que la pantalla se actualice sol
 | Última vez de un ejercicio | Prellenado de series (RF-28) | Series de la sesión `TERMINADA` más reciente que incluya `ejercicio_id = :id`, por `numero_serie`. |
 | Sesión en curso | Retomar sesión (RNF-07) | `sesion_gym` con `estado = EN_CURSO`, y sus series. |
 | Minutos entrenados | Estadísticas (RF-33) | `SUM(duracion_seg)` de sesiones `TERMINADA` en el rango, agrupado por semana o por mes. |
-| Sesiones hechas frente a planificadas | Estadísticas (RF-33) | Actividades `GYM` del rango con `fecha <= hoy`. Planificadas: las que no están `SALTADA`. Hechas: las `CUMPLIDA`. |
+| Sesiones hechas frente a planificadas | Estadísticas (RF-33) | Actividades `GYM` del rango con `fecha <= hoy`, más las `CUMPLIDA` con fecha futura (una sesión hecha antes de su día). Planificadas: las que no están `SALTADA`. Hechas: las `CUMPLIDA`. |
 | Progreso de fuerza | Estadísticas (RF-33) | Por sesión, para `ejercicio_id = :id`: `MAX(peso_kg)` y `SUM(repeticiones * peso_kg)` como volumen. |
 | Peso e IMC | Estadísticas y CU-17 | `registro_peso` en el rango, por `fecha`. El IMC se calcula en Kotlin con la estatura. |
 | Avisos por programar | Reinicio del celular (RF-43) | Actividades con `estado = PENDIENTE`, `fecha >= :hoy` y `aviso_minutos_antes` no nulo, más los exámenes y simulacros futuros. |

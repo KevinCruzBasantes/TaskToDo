@@ -63,6 +63,13 @@ class AjustesRepository(private val datos: DataStore<Preferences>) {
         )
     }
 
+    /** Estatura para el IMC (CU-17); sin ella los registros se muestran sin IMC. */
+    val estaturaCm: Flow<Int?> = datos.data.map { p -> p[ESTATURA] }
+
+    suspend fun guardarEstatura(cm: Int?) {
+        datos.edit { if (cm == null) it.remove(ESTATURA) else it[ESTATURA] = cm }
+    }
+
     /** Fecha de fin opcional de la programación del gym (RF-23). */
     val finProgramacionGym: Flow<LocalDate?> = datos.data.map { p -> p[FIN_GYM]?.let(LocalDate::parse) }
 
@@ -155,6 +162,7 @@ class AjustesRepository(private val datos: DataStore<Preferences>) {
         val AVISO_GYM = booleanPreferencesKey("avisos_gym")
         val MINUTOS_GYM = intPreferencesKey("avisos_minutos_gym")
         val FIN_GYM = stringPreferencesKey("fin_programacion_gym")
+        val ESTATURA = intPreferencesKey("estatura_cm")
         val CARPETA_RESPALDOS = stringPreferencesKey("carpeta_respaldos")
         val ULTIMO_RESPALDO = longPreferencesKey("ultimo_respaldo")
         val RESPALDO_AUTOMATICO = booleanPreferencesKey("respaldo_automatico")

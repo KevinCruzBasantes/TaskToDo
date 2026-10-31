@@ -54,6 +54,8 @@ import com.calendar.tasktodo.data.db.entidad.SesionGym
 import com.calendar.tasktodo.data.repositorio.ActividadRepository
 import com.calendar.tasktodo.data.repositorio.EleccionDia
 import com.calendar.tasktodo.data.repositorio.GymRepository
+import com.calendar.tasktodo.data.repositorio.PesoRepository
+import com.calendar.tasktodo.data.repositorio.RegistroConImc
 import com.calendar.tasktodo.data.repositorio.SesionRepository
 import com.calendar.tasktodo.ui.calendario.lunesDe
 import com.calendar.tasktodo.ui.componentes.CampoHora
@@ -87,6 +89,8 @@ data class GymUiState(
     val hechasSemana: Int = 0,
     val planificadasSemana: Int = 0,
     val hoy: LocalDate = LocalDate.MIN,
+    /** El registro de peso más reciente, para el acceso a Peso e IMC. */
+    val ultimoPeso: RegistroConImc? = null,
 )
 
 /** Inicio del gym (diseño de interfaz §3.8). */
@@ -94,6 +98,7 @@ class GymViewModel(
     private val gym: GymRepository,
     private val actividades: ActividadRepository,
     sesiones: SesionRepository,
+    peso: PesoRepository,
     reloj: Clock,
 ) : ViewModel() {
 
@@ -118,7 +123,8 @@ class GymViewModel(
             planificadasSemana = planificadas.size,
             hoy = hoy,
         )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), GymUiState())
+    }.combine(peso.registros) { estado, registros -> estado.copy(ultimoPeso = registros.firstOrNull()) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), GymUiState())
 
     /** Solo esa sesión; la programación semanal no cambia (CU-15). */
     fun mover(actividadId: Long, fecha: LocalDate, hora: LocalTime) {
@@ -133,7 +139,7 @@ class GymViewModel(
         val Factory = viewModelFactory {
             initializer {
                 val c = contenedor()
-                GymViewModel(c.gymRepository, c.actividadRepository, c.sesionRepository, c.reloj)
+                GymViewModel(c.gymRepository, c.actividadRepository, c.sesionRepository, c.pesoRepository, c.reloj)
             }
         }
     }
@@ -145,6 +151,8 @@ fun GymScreen(
     onAbrirSesion: (Long) -> Unit,
     onRutinas: () -> Unit,
     onProgramacion: () -> Unit,
+    onPeso: () -> Unit = {},
+    onEstadisticas: () -> Unit = {},
     viewModel: GymViewModel = viewModel(factory = GymViewModel.Factory),
 ) {
     val estado by viewModel.estado.collectAsStateWithLifecycle()
@@ -204,6 +212,18 @@ fun GymScreen(
             ListItem(headlineContent = { Text("📋 Rutinas") }, modifier = Modifier.clickable(onClick = onRutinas))
             HorizontalDivider()
             ListItem(headlineContent = { Text("🗓 Programación") }, modifier = Modifier.clickable(onClick = onProgramacion))
+            HorizontalDivider()
+            ListItem(
+                headlineContent = { Text("⚖ Peso e IMC") },
+                trailingContent = {
+                    estado.ultimoPeso?.let { u ->
+                        Text("${textoPeso(u.registro.pesoKg)} kg" + (u.imc?.let { " · ${textoImc(it)}" } ?: ""))
+                    }
+                },
+                modifier = Modifier.clickable(onClick = onPeso),
+            )
+            HorizontalDivider()
+            ListItem(headlineContent = { Text("📈 Estadísticas") }, modifier = Modifier.clickable(onClick = onEstadisticas))
             HorizontalDivider()
         }
     }

@@ -73,3 +73,9 @@ data object Programacion
 /** La sesión de gym de una actividad (CU-16). */
 @Serializable
 data class Sesion(val actividadId: Long)
+
+@Serializable
+data object Peso
+
+@Serializable
+data object Estadisticas

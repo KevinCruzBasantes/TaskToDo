@@ -15,10 +15,8 @@ import com.calendar.tasktodo.data.db.entidad.Medida
 import com.calendar.tasktodo.data.db.entidad.Rutina
 import com.calendar.tasktodo.data.db.entidad.Materia
 import com.calendar.tasktodo.data.db.entidad.TipoActividad
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.emptyPreferences
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.calendar.tasktodo.data.db.entidad.RegistroPeso
+import com.calendar.tasktodo.prueba.DataStoreEnMemoria
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -37,13 +35,6 @@ class RestauracionRoomTest {
 
     private lateinit var db: AgendaDatabase
     private val archivos = linkedMapOf<String, String>()
-
-    private class DataStoreEnMemoria : DataStore<Preferences> {
-        private val estado = MutableStateFlow(emptyPreferences())
-        override val data = estado
-        override suspend fun updateData(transform: suspend (t: Preferences) -> Preferences) =
-            transform(estado.value).also { estado.value = it }
-    }
 
     private val almacen = object : AlmacenRespaldos {
         override fun registrar(carpeta: String) = Unit
@@ -74,7 +65,7 @@ class RestauracionRoomTest {
     fun crear() {
         db = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), AgendaDatabase::class.java).build()
         repo = RespaldoRepository(
-            db.materiaDao(), db.claseDao(), db.actividadDao(), db.gymDao(), AjustesRepository(DataStoreEnMemoria()), almacen, planificador,
+            db.materiaDao(), db.claseDao(), db.actividadDao(), db.gymDao(), db.pesoDao(), AjustesRepository(DataStoreEnMemoria()), almacen, planificador,
             transaccion = { bloque -> db.withTransaction { bloque() } },
             reloj = Clock.systemUTC(),
             versionApp = "prueba",
@@ -87,6 +78,7 @@ class RestauracionRoomTest {
             val pierna = db.gymDao().insertarRutina(Rutina(nombre = "Pierna", descansoEntreEjerciciosSeg = 120))
             db.gymDao().insertarEjercicio(Ejercicio(rutinaId = pierna, orden = 0, nombre = "Sentadilla", medida = Medida.REPETICIONES, series = 4, repeticiones = 10, pesoKg = 60.0))
             val dia = db.gymDao().insertarDia(DiaGym(diaSemana = DayOfWeek.MONDAY, hora = LocalTime.of(18, 0), rutinaId = pierna))
+            db.pesoDao().insertar(RegistroPeso(fecha = LocalDate.of(2026, 10, 30), pesoKg = 72.5))
             db.gymDao().insertarGenerada(
                 Actividad(titulo = "Pierna", tipo = TipoActividad.GYM, fecha = LocalDate.of(2026, 11, 2), hora = LocalTime.of(18, 0),
                     rutinaId = pierna, diaGymId = dia, fechaProgramada = LocalDate.of(2026, 11, 2)),
@@ -109,6 +101,7 @@ class RestauracionRoomTest {
 
         assertEquals(antes, Triple(db.materiaDao().todas(), db.claseDao().todas(), db.actividadDao().todas()))
         assertEquals(gymAntes, Triple(db.gymDao().rutinas(), db.gymDao().todosLosEjercicios(), db.gymDao().dias()))
+        assertEquals(listOf(72.5), db.pesoDao().todos().map { it.pesoKg })
         assertTrue(archivos.keys.any { it.startsWith("agenda-seguridad-") })
     }
 

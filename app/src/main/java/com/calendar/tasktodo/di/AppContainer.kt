@@ -6,7 +6,9 @@ import com.calendar.tasktodo.data.ajustes.AjustesRepository
 import androidx.room.withTransaction
 import com.calendar.tasktodo.data.db.AgendaDatabase
 import com.calendar.tasktodo.data.repositorio.ActividadRepository
+import com.calendar.tasktodo.data.repositorio.EstadisticasRepository
 import com.calendar.tasktodo.data.repositorio.GymRepository
+import com.calendar.tasktodo.data.repositorio.PesoRepository
 import com.calendar.tasktodo.data.repositorio.HorarioRepository
 import com.calendar.tasktodo.data.repositorio.SesionRepository
 import com.calendar.tasktodo.data.respaldo.RespaldoRepository
@@ -61,6 +63,10 @@ class AppContainer(context: Context) {
 
     val sesionRepository = SesionRepository(baseDeDatos.gymDao(), baseDeDatos.actividadDao(), reloj, servicioAvisos)
 
+    val pesoRepository = PesoRepository(baseDeDatos.pesoDao(), ajustesRepository)
+
+    val estadisticasRepository = EstadisticasRepository(baseDeDatos.gymDao(), pesoRepository)
+
     val controlSesion: ControlSesion = ControlSesionAndroid(context, sesionRepository)
 
     val respaldoRepository = RespaldoRepository(
@@ -68,6 +74,7 @@ class AppContainer(context: Context) {
         clases = baseDeDatos.claseDao(),
         actividades = baseDeDatos.actividadDao(),
         gym = baseDeDatos.gymDao(),
+        peso = baseDeDatos.pesoDao(),
         ajustes = ajustesRepository,
         almacen = AlmacenSaf(context),
         planificador = PlanificadorRespaldoWork(context),

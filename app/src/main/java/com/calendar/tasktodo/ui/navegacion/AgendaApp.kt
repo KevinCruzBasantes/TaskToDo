@@ -46,6 +46,8 @@ import com.calendar.tasktodo.ui.ajustes.GuiaMiuiScreen
 import com.calendar.tasktodo.ui.ajustes.RespaldoScreen
 import com.calendar.tasktodo.ui.dia.DiaScreen
 import com.calendar.tasktodo.ui.gym.DetalleRutinaScreen
+import com.calendar.tasktodo.ui.gym.EstadisticasScreen
+import com.calendar.tasktodo.ui.gym.PesoScreen
 import com.calendar.tasktodo.ui.gym.FormEjercicioScreen
 import com.calendar.tasktodo.ui.gym.FormRutinaScreen
 import com.calendar.tasktodo.ui.gym.GymScreen
@@ -236,7 +238,15 @@ fun AgendaApp(
                     onAbrirSesion = { nav.navigate(Sesion(it)) },
                     onRutinas = { nav.navigate(Rutinas) },
                     onProgramacion = { nav.navigate(Programacion) },
+                    onPeso = { nav.navigate(Peso) },
+                    onEstadisticas = { nav.navigate(Estadisticas) },
                 )
+            }
+            composable<Peso> { entrada ->
+                PesoScreen(onAtras = { nav.volverDesde(entrada) })
+            }
+            composable<Estadisticas> { entrada ->
+                EstadisticasScreen(onAtras = { nav.volverDesde(entrada) })
             }
             composable<Rutinas> { entrada ->
                 RutinasScreen(

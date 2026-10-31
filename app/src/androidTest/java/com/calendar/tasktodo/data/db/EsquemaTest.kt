@@ -115,4 +115,54 @@ class EsquemaTest {
             contexto.deleteDatabase(nombre)
         }
     }
+
+    @Test
+    fun laMigracionDe3A4ConservaTodoYAgregaElRegistroDePeso_CP_6_11() {
+        val nombre = "migracion-3-4.db"
+        ayudante.createDatabase(nombre, 3).use { db ->
+            db.execSQL("INSERT INTO materia (id, nombre, color) VALUES (1, 'Cálculo', 1)")
+            db.execSQL("INSERT INTO clase (id, materia_id, dia_semana, hora_inicio, hora_fin, aula) VALUES (5, 1, 1, '07:00', '09:00', NULL)")
+            db.execSQL("INSERT INTO rutina (id, nombre, descanso_entre_ejercicios_seg) VALUES (2, 'Pierna', 120)")
+            db.execSQL(
+                "INSERT INTO ejercicio (id, rutina_id, orden, nombre, medida, series, repeticiones, duracion_seg, peso_kg, " +
+                    "descanso_series_seg, descanso_tras_ejercicio_seg, nota) VALUES (3, 2, 0, 'Sentadilla', 'REPETICIONES', 4, 10, NULL, 60.0, 90, NULL, NULL)",
+            )
+            db.execSQL("INSERT INTO dia_gym (id, dia_semana, hora, rutina_id) VALUES (4, 1, '18:00', 2)")
+            db.execSQL(
+                "INSERT INTO actividad (id, titulo, tipo, fecha, hora, materia_id, notas, aviso_minutos_antes, estado, rutina_id, dia_gym_id, fecha_programada) " +
+                    "VALUES (7, 'Pierna', 'GYM', '2026-11-02', '18:00', NULL, NULL, NULL, 'PENDIENTE', 2, 4, '2026-11-02')",
+            )
+            db.execSQL(
+                "INSERT INTO sesion_gym (id, actividad_id, rutina_id, nombre_rutina, fecha, inicio, fin, duracion_seg, estado, descanso_termina_en, orden_ejercicios) " +
+                    "VALUES (8, NULL, 2, 'Pierna', '2026-10-26', 1793037600000, 1793040600000, 3000, 'TERMINADA', NULL, '3')",
+            )
+            db.execSQL(
+                "INSERT INTO serie_realizada (id, sesion_id, ejercicio_id, nombre_ejercicio, orden_ejercicio, numero_serie, medida, repeticiones, duracion_seg, peso_kg, completada_en) " +
+                    "VALUES (9, 8, 3, 'Sentadilla', 1, 1, 'REPETICIONES', 10, NULL, 60.0, 1793037700000)",
+            )
+        }
+
+        ayudante.runMigrationsAndValidate(nombre, 4, true).close()
+
+        val contexto = ApplicationProvider.getApplicationContext<android.content.Context>()
+        val db = Room.databaseBuilder(contexto, AgendaDatabase::class.java, nombre).build()
+        try {
+            runBlocking {
+                assertEquals(1, db.claseDao().todas().size)
+                assertEquals("Pierna", db.gymDao().obtenerRutina(2)?.nombre)
+                assertEquals(1, db.gymDao().ejercicios(2).size)
+                assertEquals(1, db.gymDao().dias().size)
+                assertEquals(java.time.LocalDate.of(2026, 11, 2), db.actividadDao().obtener(7)?.fechaProgramada)
+                assertEquals(3000, db.gymDao().obtenerSesion(8)?.duracionSeg)
+                assertEquals(listOf(3L), db.gymDao().obtenerSesion(8)?.ordenEjercicios)
+                assertEquals(1, db.gymDao().series(8).size)
+
+                db.pesoDao().insertar(com.calendar.tasktodo.data.db.entidad.RegistroPeso(fecha = java.time.LocalDate.of(2026, 10, 30), pesoKg = 72.5))
+                assertEquals(1, db.pesoDao().todos().size)
+            }
+        } finally {
+            db.close()
+            contexto.deleteDatabase(nombre)
+        }
+    }
 }

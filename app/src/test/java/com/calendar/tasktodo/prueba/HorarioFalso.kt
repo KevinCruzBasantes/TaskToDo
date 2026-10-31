@@ -205,6 +205,8 @@ class HorarioFalso {
 
     val gymDao = GymFalso(actividades)
 
+    val pesoDao = PesoFalso()
+
     val repositorio = HorarioRepository(materiaDao, claseDao, observador)
 
     val actividadRepositorio = ActividadRepository(actividadDao, observador)

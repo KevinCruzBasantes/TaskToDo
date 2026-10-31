@@ -6,6 +6,7 @@ import com.calendar.tasktodo.data.db.AgendaDatabase
 import com.calendar.tasktodo.data.db.dao.ActividadDao
 import com.calendar.tasktodo.data.db.dao.ClaseDao
 import com.calendar.tasktodo.data.db.dao.GymDao
+import com.calendar.tasktodo.data.db.dao.PesoDao
 import com.calendar.tasktodo.data.db.dao.MateriaDao
 import com.calendar.tasktodo.data.repositorio.ObservadorCambios
 import kotlinx.coroutines.CoroutineDispatcher
@@ -115,6 +116,7 @@ class RespaldoRepository(
     private val clases: ClaseDao,
     private val actividades: ActividadDao,
     private val gym: GymDao,
+    private val peso: PesoDao,
     private val ajustes: AjustesRepository,
     private val almacen: AlmacenRespaldos,
     private val planificador: PlanificadorRespaldo,
@@ -139,12 +141,13 @@ class RespaldoRepository(
         val respaldo = ajustes.respaldo.first()
         val avisos = ajustes.avisos.first()
         val finGym = ajustes.finProgramacionGym.first()
+        val estatura = ajustes.estaturaCm.first()
         transaccion {
             dto = RespaldoDto(
                 versionBaseDatos = AgendaDatabase.VERSION,
                 versionApp = versionApp,
                 fecha = Instant.now(reloj).toString(),
-                ajustes = avisos.aDto(respaldo.automatico, respaldo.frecuencia, finGym),
+                ajustes = avisos.aDto(respaldo.automatico, respaldo.frecuencia, finGym, estatura),
                 materias = materias.todas().map { it.aDto() },
                 clases = clases.todas().map { it.aDto() },
                 actividades = actividades.todas().map { it.aDto() },
@@ -153,6 +156,7 @@ class RespaldoRepository(
                 diasGym = gym.dias().map { it.aDto() },
                 sesiones = gym.todasLasSesiones().map { it.aDto() },
                 series = gym.todasLasSeries().map { it.aDto() },
+                registrosPeso = peso.todos().map { it.aDto() },
             )
         }
         return json.encodeToString(RespaldoDto.serializer(), dto)
@@ -268,8 +272,10 @@ class RespaldoRepository(
             val nuevosDias = dto.diasGym.map { it.aEntidad() }
             val nuevasSesiones = dto.sesiones.map { it.aEntidad() }
             val nuevasSeries = dto.series.map { it.aEntidad() }
+            val nuevosPesos = dto.registrosPeso.map { it.aEntidad() }
             transaccion {
                 // Primero los hijos y después los padres al borrar; al revés al insertar (diagramas §2.3)
+                peso.vaciar()
                 gym.vaciarSeries()
                 gym.vaciarSesiones()
                 actividades.eliminarTodas()
@@ -286,12 +292,14 @@ class RespaldoRepository(
                 actividades.insertarTodas(nuevasActividades)
                 gym.insertarSesiones(nuevasSesiones)
                 gym.insertarSeries(nuevasSeries)
+                peso.insertarTodos(nuevosPesos)
             }
         } catch (e: Exception) {
             return ResultadoRestauracion.Error(e.message ?: "No se pudo restaurar")
         }
         ajustes.guardarAvisos(dto.ajustes.avisos())
         ajustes.guardarFinProgramacionGym(dto.ajustes.finProgramacionGym?.let(LocalDate::parse))
+        ajustes.guardarEstatura(dto.ajustes.estaturaCm)
         val frecuencia = Frecuencia.entries.firstOrNull { it.name == dto.ajustes.frecuenciaRespaldo } ?: Frecuencia.SEMANAL
         configurarAutomatico(dto.ajustes.respaldoAutomatico, frecuencia)
         observador.huboCambios()

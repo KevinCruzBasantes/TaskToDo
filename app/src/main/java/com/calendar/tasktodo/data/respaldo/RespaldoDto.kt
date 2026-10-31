@@ -10,6 +10,7 @@ import com.calendar.tasktodo.data.db.entidad.EstadoActividad
 import com.calendar.tasktodo.data.db.entidad.EstadoSesion
 import com.calendar.tasktodo.data.db.entidad.Materia
 import com.calendar.tasktodo.data.db.entidad.Medida
+import com.calendar.tasktodo.data.db.entidad.RegistroPeso
 import com.calendar.tasktodo.data.db.entidad.Rutina
 import com.calendar.tasktodo.data.db.entidad.SerieRealizada
 import com.calendar.tasktodo.data.db.entidad.SesionGym
@@ -40,6 +41,7 @@ data class RespaldoDto(
     val diasGym: List<DiaGymDto> = emptyList(),
     val sesiones: List<SesionDto> = emptyList(),
     val series: List<SerieDto> = emptyList(),
+    val registrosPeso: List<RegistroPesoDto> = emptyList(),
 )
 
 /** Los ajustes que viajan en el respaldo; la carpeta y el estado interno son de cada instalación. */
@@ -59,6 +61,7 @@ data class AjustesDto(
     val avisoGym: Boolean = true,
     val minutosGym: Int = 15,
     val finProgramacionGym: String? = null,
+    val estaturaCm: Int? = null,
 )
 
 @Serializable
@@ -90,6 +93,13 @@ data class ActividadDto(
     val diaGymId: Long? = null,
     val fechaProgramada: String? = null,
 )
+
+@Serializable
+data class RegistroPesoDto(val id: Long, val fecha: String, val pesoKg: Double)
+
+fun RegistroPeso.aDto() = RegistroPesoDto(id, fecha.toString(), pesoKg)
+
+fun RegistroPesoDto.aEntidad() = RegistroPeso(id, LocalDate.parse(fecha), pesoKg)
 
 @Serializable
 data class RutinaDto(val id: Long, val nombre: String, val descansoEntreEjerciciosSeg: Int? = null)
@@ -225,9 +235,10 @@ fun ActividadDto.aEntidad() = Actividad(
     fechaProgramada = fechaProgramada?.let(LocalDate::parse),
 )
 
-fun AjustesAvisos.aDto(automatico: Boolean, frecuencia: Frecuencia, finGym: LocalDate?) = AjustesDto(
+fun AjustesAvisos.aDto(automatico: Boolean, frecuencia: Frecuencia, finGym: LocalDate?, estaturaCm: Int? = null) = AjustesDto(
     actividades, horaSinHora.toString(), diaAnterior, horaDiaAnterior.toString(), clases, minutosClase,
     resumen, horaResumen.toString(), prioridadAlarma, automatico, frecuencia.name, gym, minutosGym, finGym?.toString(),
+    estaturaCm,
 )
 
 fun AjustesDto.avisos() = AjustesAvisos(

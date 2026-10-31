@@ -257,7 +257,7 @@ Cada caso tiene un identificador `CP-<incremento>.<número>`, su tipo (U unitari
 
 - CP-5.03, CP-5.05 y CP-5.06 se probaron como unitarias: CP-5.03 sobre `FormEjercicioViewModel`, y CP-5.05 y CP-5.06 sobre `GymRepository.moverEjercicio`. El arrastre y el "Deshacer" de la pantalla los revisó el usuario en el Xiaomi.
 - CP-5.07 a CP-5.09 se probaron como unitarias con `GymFalso`, que reproduce las reglas de Room que importan: RESTRICT de la rutina, CASCADE de los ejercicios y la clave única de las actividades generadas. La migración CP-5.32 y el respaldo con datos de gym sí corren con Room real en el celular.
-- CP-5.15 y CP-5.37 no tienen prueba automática: el filtro de rutinas vacías está en `ProgramacionViewModel`, y abrir la sesión desde el módulo del día lo revisó el usuario. Quedan para agregarlas en el incremento 6.
+- CP-5.15 y CP-5.37 se automatizaron en el incremento 6: CP-5.15 como unitaria sobre `ProgramacionViewModel`, y CP-5.37 como prueba de interfaz en el celular (`GymUiTest`), que toca el gym en el módulo del día y comprueba que se abre su rutina con "Iniciar sesión".
 - Las manuales CP-5.33 a CP-5.36 las hizo el usuario el 31 de octubre de 2026 con la app dev, y después se instaló la 5.0 encima de la 4.0 sin perder datos (CP-1.19).
 
 ### 3.6 Incremento 6 · Peso, IMC y estadísticas
@@ -275,6 +275,14 @@ Cada caso tiene un identificador `CP-<incremento>.<número>`, su tipo (U unitari
 | CP-6.09 | U | Cambiar el periodo entre semana, mes, 3 meses y todo. | Cada gráfica usa solo los datos del periodo. | RF-33 |
 | CP-6.10 | U | Periodo sin datos. | Cada gráfica muestra "Sin datos en este periodo". | CU-18 2a |
 | CP-6.11 | I | Migración de la versión 3 a la 4 con todos los datos de prueba. | Todo se conserva y existe `registro_peso`. | RNF-04 |
+| CP-6.12 | U, I | Respaldar y restaurar con registros de peso y estatura. | Los registros y la estatura vuelven iguales. | RF-32, RF-44 |
+
+**Cómo quedaron implementadas (incremento 6)**
+
+- CP-6.01 a CP-6.05 son unitarias sobre `Imc`, `PesoRepository` y `PesoViewModel`; CP-6.06 a CP-6.10, sobre `CalculoEstadisticas`, que hace los cálculos de las gráficas sin base de datos.
+- CP-6.07 suma un caso que apareció en las pruebas manuales: una sesión de la semana siguiente hecha hoy cuenta como hecha y planificada, aunque su fecha sea futura.
+- CP-6.11 y CP-6.12 corren con Room real en el celular. CP-6.12 también es unitaria.
+- El usuario probó en el Xiaomi el registro de peso, el cambio de estatura, el reemplazo y el borrado, y las gráficas de cada periodo. Después se instaló la 6.0 encima de la 5.0 sin perder datos (CP-1.19).
 
 ### 3.7 Lista de humo en el Xiaomi
 

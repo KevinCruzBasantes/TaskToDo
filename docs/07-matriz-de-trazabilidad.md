@@ -72,8 +72,8 @@ La matriz conecta cada requerimiento con su caso de uso, los datos que usa, las 
 | RF-29 | Descansos y cuenta regresiva | CU-16 | `sesion_gym` | Sesión de gym | CP-5.22 a CP-5.25, CP-5.33 | 5 | 2026-10-31 · 5.0 (manual CP-5.33 hecha por el usuario) |
 | RF-30 | Notificación fija de la sesión | CU-16 | `sesion_gym` | Notificación de la sesión | CP-5.33 | 5 | 2026-10-31 · 5.0 (manual hecha por el usuario) |
 | RF-31 | Guardar sesión; no realizada si no se hizo | CU-16 | `sesion_gym`, `serie_realizada`, `actividad` | Sesión de gym, Hoy | CP-5.29 a CP-5.31 | 5 | 2026-10-31 · 5.0 |
-| RF-32 | Registros de peso, estatura e IMC | CU-17 | `registro_peso`, Ajustes | Peso e IMC | CP-6.01 a CP-6.05 | 6 | — |
-| RF-33 | Estadísticas con gráficas | CU-18 | `sesion_gym`, `serie_realizada`, `actividad`, `registro_peso` | Estadísticas | CP-6.06 a CP-6.10 | 6 | — |
+| RF-32 | Registros de peso, estatura e IMC | CU-17 | `registro_peso`, Ajustes | Peso e IMC | CP-6.01 a CP-6.05, CP-6.12 | 6 | 2026-10-31 · 6.0 |
+| RF-33 | Estadísticas con gráficas | CU-18 | `sesion_gym`, `serie_realizada`, `actividad`, `registro_peso` | Estadísticas | CP-6.06 a CP-6.10 | 6 | 2026-10-31 · 6.0 |
 
 ### 1.5 Vistas jerárquicas
 
@@ -115,7 +115,7 @@ Los RNF valen para toda la app, así que se verifican en cada incremento desde e
 | RNF-01 · Plataforma | Android 8.0+, Kotlin y Compose; probada en Android 12 con MIUI 13 | [Arquitectura §5.1](03-arquitectura.md#51-base-del-proyecto), §4.6 | CP-1.13 | 1 | 2026-10-31 · 1.1 |
 | RNF-02 · Alcance | Un usuario, sin cuentas ni servidor | Arquitectura §1, §4.5 (sin permiso de internet) | Criterio de calidad "Sin cuentas ni red" | 1 | — |
 | RNF-03 · Almacenamiento | Room local, funciona sin internet | [Modelo de datos](02-modelo-de-datos.md) | Criterio de calidad "Sin internet" | 1 | — |
-| RNF-04 · Persistencia | No perder datos; instalar encima con la misma firma | [Modelo de datos §5](02-modelo-de-datos.md#5-versionado-y-migraciones), [arquitectura §5.3](03-arquitectura.md#53-firma-versiones-e-instalación) | CP-1.12, CP-1.15 a CP-1.19, CP-2.12, CP-3.18, CP-5.32, CP-6.11 | 1 | Parcial: 2026-10-31 · 5.0 (firma, instalación encima, migraciones 1→2 y 2→3, y reinstalación con restauración; falta la del inc. 6) |
+| RNF-04 · Persistencia | No perder datos; instalar encima con la misma firma | [Modelo de datos §5](02-modelo-de-datos.md#5-versionado-y-migraciones), [arquitectura §5.3](03-arquitectura.md#53-firma-versiones-e-instalación) | CP-1.12, CP-1.15 a CP-1.19, CP-2.12, CP-3.18, CP-5.32, CP-6.11 | 1 | 2026-10-31 · 6.0 (firma, instalación encima en cada versión, migraciones 1→2, 2→3 y 3→4, y reinstalación con restauración) |
 | RNF-05 · Respaldo | Fuera de la app, en una carpeta registrada | Arquitectura §4.4 | CP-3.15, CP-3.18 | 3 | 2026-10-31 · 3.0 (reinstalación CP-3.18 hecha por el usuario) |
 | RNF-06 · Respaldo | JSON con versiones y fecha | [Diagramas §2.2](05-diagramas-de-comportamiento.md#22-respaldar-ahora) | CP-3.01, CP-3.02, CP-3.10 | 3 | 2026-10-31 · 3.0 |
 | RNF-07 · Confiabilidad | Cronómetro desde la hora guardada y servicio en primer plano | Arquitectura §4.3, [diagramas §1.3](05-diagramas-de-comportamiento.md#13-recuperar-una-sesión-después-de-un-cierre) | CP-5.34, CP-5.35 | 5 | 2026-10-31 · 5.0 (manuales hechas por el usuario) |

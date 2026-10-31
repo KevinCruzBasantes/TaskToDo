@@ -41,6 +41,7 @@ class RespaldoRepositoryTest {
         clases = horario.claseDao,
         actividades = horario.actividadDao,
         gym = horario.gymDao,
+        peso = horario.pesoDao,
         ajustes = ajustes.repositorio,
         almacen = almacen,
         planificador = planificador,
@@ -259,5 +260,21 @@ class RespaldoRepositoryTest {
 
         assertTrue(horario.materias.value.isEmpty())
         assertEquals(1, almacen.archivos.size)
+    }
+
+    @Test
+    fun `los registros de peso y la estatura viajan en el respaldo (CP-6_12)`() = runTest {
+        val repo = conCarpeta()
+        horario.pesoDao.insertar(com.calendar.tasktodo.data.db.entidad.RegistroPeso(fecha = DatosDePrueba.HOY, pesoKg = 72.5))
+        ajustes.repositorio.guardarEstatura(175)
+        val contenido = repo.generar()
+        val antes = horario.pesoDao.todos()
+
+        horario.pesoDao.vaciar()
+        ajustes.repositorio.guardarEstatura(null)
+        assertEquals(ResultadoRestauracion.Exito, repo.restaurar(contenido))
+
+        assertEquals(antes, horario.pesoDao.todos())
+        assertEquals(175, ajustes.repositorio.estaturaCm.first())
     }
 }

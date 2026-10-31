@@ -12,6 +12,7 @@ import com.calendar.tasktodo.prueba.DatosDePrueba.hora
 import com.calendar.tasktodo.prueba.ReglaAjustes
 import com.calendar.tasktodo.prueba.ReglaDespachadorPrincipal
 import com.calendar.tasktodo.ui.gym.FormEjercicioViewModel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -234,5 +235,16 @@ class GymRepositoryTest {
         gym.guardarRutina(Rutina(id = pierna, nombre = "Pierna y glúteo"))
 
         assertTrue(gymGeneradas().all { it.titulo == "Pierna y glúteo" })
+    }
+
+    @Test
+    fun `al programar solo se ofrecen rutinas con ejercicios (CP-5_15)`() = runTest {
+        rutinaConEjercicios("Pierna", 2)
+        rutinaConEjercicios("Vacía", 0)
+        val vm = com.calendar.tasktodo.ui.gym.ProgramacionViewModel(gym)
+
+        val estado = vm.estado.first { !it.cargando && it.rutinas.isNotEmpty() }
+
+        assertEquals(listOf("Pierna"), estado.rutinas.map { it.rutina.nombre })
     }
 }

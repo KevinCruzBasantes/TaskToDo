@@ -200,6 +200,21 @@ interface GymDao {
     @Query("DELETE FROM rutina")
     suspend fun vaciarRutinas()
 
+    // Estadísticas (RF-33)
+
+    @Query("SELECT * FROM sesion_gym WHERE estado = 'TERMINADA' ORDER BY inicio")
+    fun observarTerminadas(): Flow<List<SesionGym>>
+
+    /** Las series de sesiones guardadas cuyo ejercicio todavía existe. */
+    @Query(
+        """
+        SELECT serie_realizada.* FROM serie_realizada
+        INNER JOIN sesion_gym ON sesion_gym.id = serie_realizada.sesion_id
+        WHERE sesion_gym.estado = 'TERMINADA' AND serie_realizada.ejercicio_id IS NOT NULL
+        """,
+    )
+    fun observarSeriesTerminadas(): Flow<List<SerieRealizada>>
+
     /** Lo que se hizo la última vez en esa serie de ese ejercicio, para prellenar (RF-28). */
     @Query(
         """
