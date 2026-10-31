@@ -318,25 +318,28 @@ Estas versiones ya están en el proyecto:
 | Compose BOM | 2026.02.01 |
 | Java | 11 |
 
-`core-ktx` (1.10.1), `lifecycle-runtime-ktx` (2.6.1) y `activity-compose` (1.8.0) vienen de la plantilla y son antiguas. Se actualizan al empezar el incremento 1.
+`core-ktx`, `lifecycle` y `activity-compose` venían de la plantilla con versiones antiguas; en el incremento 1 se actualizaron a 1.19.1, 2.11.0 y 1.13.0, y el BOM de Compose a 2026.09.00.
 
 ### 5.2 Librerías por agregar
 
-Las versiones exactas se fijan en `gradle/libs.versions.toml` al empezar el incremento que las necesita, con la última estable compatible. KSP debe coincidir con la versión de Kotlin.
+Las versiones exactas se fijan en `gradle/libs.versions.toml` al empezar el incremento que las necesita, con la última estable compatible.
 
-| Librería | Para qué | Incremento |
-|---|---|---|
-| Room (`room-runtime`, `room-ktx`, `room-compiler` con KSP) | Base de datos, `Flow` y migraciones. | 1 |
-| KSP | Procesador de anotaciones de Room. | 1 |
-| Navigation Compose | Navegación con rutas tipadas. | 1 |
-| kotlinx.serialization (plugin y `json`) | Rutas de navegación y JSON del respaldo. | 1 |
-| Lifecycle (`viewmodel-compose`, `runtime-compose`) | ViewModels en Compose y `collectAsStateWithLifecycle`. | 1 |
-| DataStore Preferences | Ajustes. | 1 |
-| WorkManager (`work-runtime-ktx`) | Respaldo automático y mantenimiento diario. | 3 |
-| Reorderable (`sh.calvin.reorderable`) | Arrastrar para reordenar ejercicios (CU-13 2d). | 5 |
-| Vico (`compose-m3`) | Gráficas de estadísticas (CU-18). | 6 |
+| Librería | Para qué | Incremento | Versión |
+|---|---|---|---|
+| Room (`room-runtime`, `room-ktx`, `room-compiler` con KSP, plugin `androidx.room`) | Base de datos, `Flow`, migraciones y esquema exportado en `app/schemas/`. | 1 | 2.8.5 |
+| KSP | Procesador de anotaciones de Room. | 1 | 2.3.13 |
+| Navigation Compose | Navegación con rutas tipadas. | 1 | 2.10.2 |
+| kotlinx.serialization (plugin y `json`) | Rutas de navegación y JSON del respaldo. | 1 | 1.9.0 (compatible con Kotlin 2.2) |
+| Lifecycle (`viewmodel-compose`, `runtime-compose`) | ViewModels en Compose y `collectAsStateWithLifecycle`. | 1 | 2.11.0 |
+| Material Icons Core | Íconos de la barra y los botones. | 1 | Del BOM de Compose |
+| DataStore Preferences | Ajustes. El incremento 1 no tiene ajustes que guardar. | 2 | Por fijar |
+| WorkManager (`work-runtime-ktx`) | Respaldo automático y mantenimiento diario. | 3 | Por fijar |
+| Reorderable (`sh.calvin.reorderable`) | Arrastrar para reordenar ejercicios (CU-13 2d). | 5 | Por fijar |
+| Vico (`compose-m3`) | Gráficas de estadísticas (CU-18). | 6 | Por fijar |
 
-Pruebas: JUnit 4, `kotlinx-coroutines-test`, Turbine (para probar `Flow`), `room-testing` (`MigrationTestHelper`), `work-testing` y Compose UI Test. El detalle va en el [plan de pruebas](06-plan-de-pruebas.md).
+Pruebas: JUnit 4, `kotlinx-coroutines-test` 1.10.2, Turbine 1.2.1 (para probar `Flow`), `room-testing` (`MigrationTestHelper`), `work-testing` (incremento 3) y Compose UI Test.
+
+Kotlin se mantiene en 2.2.10, la versión con la que se creó el proyecto, aunque ya existe la 2.4. Subirla es un cambio aparte, que conviene hacer entre incrementos. El detalle va en el [plan de pruebas](06-plan-de-pruebas.md).
 
 ### 5.3 Firma, versiones e instalación
 

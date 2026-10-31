@@ -30,7 +30,7 @@ flowchart TB
 3. Se hacen las pruebas manuales del incremento en el Xiaomi y la lista de humo (sección 3.7).
 4. Se prueba la **actualización**: con el APK `release` del incremento anterior instalado y con datos, se instala el nuevo encima, sin desinstalar, y se comprueba que no se perdió nada ([arquitectura §5.3](03-arquitectura.md#53-firma-versiones-e-instalación)).
 
-**El tiempo se controla en las pruebas.** Todas las clases reciben un `Clock` ([arquitectura §2](03-arquitectura.md#2-capas-mvvm)). Las pruebas lo fijan en el **viernes 31 de octubre de 2026, 10:00**, salvo que el caso diga otra cosa. Así "hoy", "ayer" y "la semana" son siempre los mismos.
+**El tiempo se controla en las pruebas.** Todas las clases reciben un `Clock` ([arquitectura §2](03-arquitectura.md#2-capas-mvvm)). Las pruebas lo fijan en el **viernes 30 de octubre de 2026, 10:00**, salvo que el caso diga otra cosa. Así "hoy", "ayer" y "la semana" son siempre los mismos.
 
 **Datos de prueba.** Un conjunto fijo, `DatosDePrueba.kt`, que comparten las pruebas unitarias y las instrumentadas:
 
@@ -38,7 +38,7 @@ flowchart TB
 |---|---|
 | Materias | Cálculo (azul), Física (verde), Inglés (naranja) |
 | Clases | Cálculo lunes, miércoles y viernes 07:00–09:00; Física martes 09:00–11:00 |
-| Actividades | Una tarea atrasada 3 días, un examen ayer sin check, una tarea hoy sin hora, un examen el 7 de noviembre a las 10:30 |
+| Actividades | Una tarea atrasada 3 días, un examen ayer sin check, una tarea hoy sin hora, un examen el 6 de noviembre a las 10:30 |
 | Rutinas | Pierna (4 ejercicios, uno por tiempo) y Torso (3 ejercicios) |
 | Programación | Lunes y viernes 18:00 Pierna, miércoles 18:00 Torso |
 | Peso | Estatura 175 cm y tres registros semanales |
@@ -102,7 +102,7 @@ Cada caso tiene un identificador `CP-<incremento>.<número>`, su tipo (U unitari
 | CP-1.08 | U | Consultar el módulo del lunes 2, el miércoles 4 y el viernes 6 de noviembre. | Cálculo aparece los tres días, sin haberse guardado por fecha. | RF-08 |
 | CP-1.09 | U | Consultar el horario semanal. | Clases de lunes a domingo, ordenadas por hora. | RF-06, CU-05 |
 | CP-1.10 | UI | En el módulo del día, tocar ‹, › y elegir una fecha en el calendario. | Muestra el día anterior, el siguiente y el elegido; el botón "Hoy" vuelve al actual. | RF-19 |
-| CP-1.11 | U | Módulo del viernes 31 de octubre. | Clases ordenadas por hora, con el nombre y el color de su materia. | RF-17 |
+| CP-1.11 | U | Módulo del viernes 30 de octubre. | Clases ordenadas por hora, con el nombre y el color de su materia. | RF-17 |
 | CP-1.12 | I | Migración: versión 1 creada desde cero con `exportSchema`. | El esquema exportado existe en `app/schemas/` y coincide. | RNF-04 |
 | CP-1.13 | M | Instalar en el Xiaomi desde Android Studio. | La app se instala y abre; el tema no usa color dinámico. | RNF-01 |
 | CP-1.14 | U | Editar el horario de una clase y después eliminarla. | El cambio se ve en todas las semanas; al eliminarla, deja de aparecer en todas. | RF-07, CU-04 1b, 1c |
@@ -118,13 +118,13 @@ Cada caso tiene un identificador `CP-<incremento>.<número>`, su tipo (U unitari
 | ID | Tipo | Caso | Resultado esperado | Verifica |
 |---|---|---|---|---|
 | CP-2.01 | U | Crear una actividad sin título o sin fecha. | No se guarda e indica qué falta. | RF-09, CU-06 3a |
-| CP-2.02 | UI | Tocar "+" en el módulo del 7 de noviembre. | El formulario abre con la fecha 7 de noviembre puesta. | RF-21 |
+| CP-2.02 | UI | Tocar "+" en el módulo del 6 de noviembre. | El formulario abre con la fecha 6 de noviembre puesta. | RF-21 |
 | CP-2.03 | U | Editar la fecha y la hora de una actividad con aviso. | Se guarda y el programador falso registra la cancelación del aviso viejo y el nuevo aviso. | RF-11 |
 | CP-2.04 | U | Eliminar una actividad con aviso. | Se borra y su aviso se cancela. | RF-12 |
 | CP-2.05 | U | Filtrar por tipo Examen y por materia Física, juntos y por separado. | Solo aparecen las que cumplen todos los filtros activos. | RF-10, CU-07 |
 | CP-2.06 | UI | Tocar el check de una actividad en el módulo del día. | Queda cumplida con un solo toque, tachada; un segundo toque la desmarca. | RF-13, RF-20, RNF-08 |
-| CP-2.07 | U | Tarea con fecha 28 de octubre sin check, hoy 31. | Aparece en "Atrasadas" con "hace 3 días". | RF-14 |
-| CP-2.08 | U | Examen del 30 de octubre sin check, hoy 31. | No aparece en "Atrasadas"; en el módulo del 30 se ve como "No marcado". | RF-15 |
+| CP-2.07 | U | Tarea con fecha 27 de octubre sin check, hoy 30. | Aparece en "Atrasadas" con "hace 3 días". | RF-14 |
+| CP-2.08 | U | Examen del 29 de octubre sin check, hoy 30. | No aparece en "Atrasadas"; en el módulo del 29 se ve como "No marcado". | RF-15 |
 | CP-2.09 | U | Reprogramar una tarea atrasada a ayer, a hoy y al 3 de noviembre. | Ayer no se permite; con hoy o el 3 sale de atrasadas. | RF-14, CU-09 |
 | CP-2.10 | U | Detalle de una clase de Física con 7 actividades futuras de Física. | Muestra las 5 próximas, ordenadas por fecha. | RF-16 |
 | CP-2.11 | U | Módulo de un día con actividades con hora y sin hora. | Las que tienen hora van en orden; las sin hora, en su grupo aparte. | RF-17 |
@@ -135,9 +135,9 @@ Cada caso tiene un identificador `CP-<incremento>.<número>`, su tipo (U unitari
 
 | ID | Tipo | Caso | Resultado esperado | Verifica |
 |---|---|---|---|---|
-| CP-2.20 | U | Actividad el 7 de noviembre 10:30 con aviso 30 min antes. | Se programa para el 7 de noviembre a las 10:00. | RF-38 |
+| CP-2.20 | U | Actividad el 6 de noviembre 10:30 con aviso 30 min antes. | Se programa para el 6 de noviembre a las 10:00. | RF-38 |
 | CP-2.21 | U | Actividad sin hora con aviso; hora fija de los ajustes 08:00. | Se programa a las 08:00 de su fecha. | RF-38 |
-| CP-2.22 | U | Examen el 7 de noviembre; aviso del día anterior a las 20:00. | Se programa también para el 6 de noviembre a las 20:00. | RF-39 |
+| CP-2.22 | U | Examen el 6 de noviembre; aviso del día anterior a las 20:00. | Se programa también para el 5 de noviembre a las 20:00. | RF-39 |
 | CP-2.23 | U | Actividad a 10 días de hoy con aviso. | No se programa todavía (fuera de la ventana de 7 días); se programa cuando entra en ella. | Diagramas §3.1 |
 | CP-2.24 | U | Reprogramar dos veces la misma actividad. | Siempre se usa el mismo código de alarma; solo queda una alarma activa. | Diagramas §3.1 |
 | CP-2.25 | U | Marcar como cumplida una actividad con aviso futuro. | Su aviso se cancela; al desmarcarla, se vuelve a programar. | RF-43, CU-08 1b |
@@ -182,11 +182,11 @@ Cada caso tiene un identificador `CP-<incremento>.<número>`, su tipo (U unitari
 
 | ID | Tipo | Caso | Resultado esperado | Verifica |
 |---|---|---|---|---|
-| CP-4.01 | U | Semana del 27 de octubre al 2 de noviembre. | Empieza el lunes 27; cada día con sus clases y actividades en orden. | RF-34 |
+| CP-4.01 | U | Semana del 26 de octubre al 1 de noviembre. | Empieza el lunes 26; cada día con sus clases y actividades en orden. | RF-34 |
 | CP-4.02 | U | Mes de noviembre de 2026. | 1 de noviembre en domingo; cada día con un punto por actividad, hasta tres; sin las clases. | RF-35 |
 | CP-4.03 | UI | Tocar un día en el mes, luego "Ver semana", luego un día en la semana. | Mes → semana de ese día → módulo de ese día. | RF-36 |
 | CP-4.04 | U | Día pasado con una tarea sin check; día pasado solo con gym no realizado; día futuro sin check. | La señal aparece solo en el primero. | RF-37 |
-| CP-4.05 | U | Semana que cruza el cambio de mes y de año (29 de diciembre al 4 de enero). | Los 7 días son correctos. | RF-34 |
+| CP-4.05 | U | Semana que cruza el cambio de mes y de año (28 de diciembre al 3 de enero). | Los 7 días son correctos. | RF-34 |
 
 ### 3.5 Incremento 5 · Gym
 
@@ -208,11 +208,11 @@ Cada caso tiene un identificador `CP-<incremento>.<número>`, su tipo (U unitari
 
 | ID | Tipo | Caso | Resultado esperado | Verifica |
 |---|---|---|---|---|
-| CP-5.10 | U | Programar lunes, miércoles y viernes; hoy viernes 31 de octubre. | Se generan las actividades de hoy a 4 semanas, en esos días, con su hora y su rutina. | RF-23 |
+| CP-5.10 | U | Programar lunes, miércoles y viernes; hoy viernes 30 de octubre. | Se generan las actividades de hoy a 4 semanas, en esos días, con su hora y su rutina. | RF-23 |
 | CP-5.11 | U | Generar dos veces seguidas. | No hay duplicados. | Diagramas §5 |
 | CP-5.12 | U | Programación con fecha de fin el 15 de noviembre. | No hay actividades después del 15. | RF-23 |
-| CP-5.13 | U | Mover el lunes 3 al martes 4 y después cambiar la hora de los lunes. | La del martes 4 se conserva; los demás lunes cambian de hora. | RF-24, CU-14 6a |
-| CP-5.14 | U | Saltar la sesión del miércoles 5. | Queda `SALTADA`, su aviso se cancela y no cuenta como planificada. | RF-24, CU-15 2a |
+| CP-5.13 | U | Mover el lunes 2 al martes 3 y después cambiar la hora de los lunes. | La del martes 3 se conserva; los demás lunes cambian de hora. | RF-24, CU-14 6a |
+| CP-5.14 | U | Saltar la sesión del miércoles 4. | Queda `SALTADA`, su aviso se cancela y no cuenta como planificada. | RF-24, CU-15 2a |
 | CP-5.15 | U | Solo se ofrecen rutinas con ejercicios al programar. | Una rutina vacía no aparece en la lista. | CU-14 4a |
 | CP-5.16 | U | Aviso de gym 15 min antes de las 18:00. | Se programa a las 17:45 con el nombre de la rutina. | RF-40 |
 

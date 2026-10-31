@@ -2,8 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- El respaldo de Android se desactiva: la app tiene su propio respaldo (arquitectura §4.4) -->
     <application
-        android:allowBackup="true"
+        android:name=".TaskToDoApp"
+        android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
@@ -14,7 +16,6 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="${appLabel}"
             android:theme="@style/Theme.TaskToDo"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>

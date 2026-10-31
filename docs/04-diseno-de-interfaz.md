@@ -12,7 +12,7 @@ Estado: en revisión · Base: [Casos de uso](01-casos-de-uso.md), [Modelo de dat
 4. **La materia se reconoce de un vistazo, pero no solo por el color.** Cada clase y actividad lleva una franja con el color de su materia y su nombre escrito, para quien no distingue bien los colores.
 5. **Nunca una pantalla vacía sin salida.** Cada lista vacía explica por qué y ofrece la acción para llenarla.
 6. **El gym se lee de lejos.** La pantalla de sesión usa números grandes y botones anchos, y deja la pantalla encendida mientras dura la sesión.
-7. **Formato local.** Fechas en español ("vie 31 oct"), semana que empieza el lunes y horas en 12 o 24 horas según el ajuste del celular.
+7. **Formato local.** Fechas en español ("vie 30 oct"), semana que empieza el lunes y horas en 12 o 24 horas según el ajuste del celular.
 
 **Estilo visual**
 
@@ -155,7 +155,7 @@ Los wireframes muestran la distribución y el contenido, no el estilo final. `�
 
 ```text
 ┌──────────────────────────────────┐
-│  ‹    Viernes 31 de octubre    › │
+│  ‹    Viernes 30 de octubre    › │
 │                Hoy          📅   │
 ├──────────────────────────────────┤
 │  ⚠ ATRASADAS (2)                 │
@@ -205,7 +205,7 @@ Los wireframes muestran la distribución y el contenido, no el estilo final. `�
 │  (Tarea) (Charla) (Simulacro)    │
 │  [Examen]                        │
 │                                  │
-│  📅 Vie 7 nov      🕐 10:30   ✕  │
+│  📅 Vie 6 nov      🕐 10:30   ✕  │
 │  ▌ Física                   ▾    │
 │                                  │
 │  🔔 Aviso      30 min antes  ▾   │
@@ -235,12 +235,12 @@ Los wireframes muestran la distribución y el contenido, no el estilo final. `�
 │  ☐ Ver cumplidas                 │
 ├──────────────────────────────────┤
 │  PRÓXIMAS                        │
-│  ☐ 📝 Examen parcial   vie 7 nov │
+│  ☐ 📝 Examen parcial   vie 6 nov │
 │       ▌ Física                   │
-│  ☐ 🗒 Proyecto final  lun 17 nov │
+│  ☐ 🗒 Proyecto final  mar 17 nov │
 │       ▌ Cálculo                  │
 │  PASADAS                         │
-│  ☐ ⏱ Simulacro         lun 27 oct│
+│  ☐ ⏱ Simulacro         mar 27 oct│
 │       ▌ Física · No marcado      │
 ├──────────────────────────────────┤
 │  Hoy  Calendario  Activ.  Gym  ⚙ │
@@ -255,22 +255,22 @@ Los wireframes muestran la distribución y el contenido, no el estilo final. `�
 ```text
 ┌──────────────────────────────────┐
 │ [Semana]  Mes   Horario          │
-│  ‹      27 oct – 2 nov 2026    › │
+│  ‹      26 oct – 1 nov 2026    › │
 ├──────────────────────────────────┤
-│  LUN 27  •                       │
+│  LUN 26  •                       │
 │   07:00 ▌Cálculo   10:00 ⏱Simul. │
-│  MAR 28                          │
+│  MAR 27                          │
 │   09:00 ▌Física    18:00 🏋Pierna │
-│  MIÉ 29                          │
+│  MIÉ 28                          │
 │   07:00 ▌Cálculo                 │
-│  JUE 30                          │
+│  JUE 29                          │
 │   18:00 🏋 Torso                  │
-│  VIE 31  HOY                     │
+│  VIE 30  HOY                     │
 │   07:00 ▌Cálculo  10:30 📝Examen │
 │   18:00 🏋 Pierna                 │
-│  SÁB 1                           │
+│  SÁB 31                          │
 │   —                              │
-│  DOM 2                           │
+│  DOM 1                           │
 │   —                              │
 ├──────────────────────────────────┤
 │  Hoy  Calendario  Activ.  Gym  ⚙ │
@@ -289,14 +289,14 @@ Los wireframes muestran la distribución y el contenido, no el estilo final. `�
 │  ‹       Noviembre 2026        › │
 ├──────────────────────────────────┤
 │  L    M    M    J    V    S    D │
-│                           1    2 │
-│  3    4    5    6    7    8    9 │
+│                                1 │
+│  2    3    4    5    6    7    8 │
 │  ●●   ●    ●●   ●    ●●●         │
-│ 10   11   12   13   14   15   16 │
+│  9   10   11   12   13   14   15 │
 │  ●    ●●   ●    ●    ●           │
 │  …                               │
 ├──────────────────────────────────┤
-│  Vie 7 nov                       │
+│  Vie 6 nov                       │
 │  📝 Examen parcial · ▌ Física     │
 │  🏋 Pierna · 18:00                │
 └──────────────────────────────────┘
@@ -583,9 +583,9 @@ Se abre como hoja inferior, sin salir de la sesión.
 │  │  Estatura 175 cm        ✎  │  │
 │  └────────────────────────────┘  │
 │                                  │
-│  vie 31 oct   72.5 kg   IMC 23.7 │
-│  vie 24 oct   73.1 kg   IMC 23.9 │
-│  vie 17 oct   73.4 kg   IMC 24.0 │
+│  vie 30 oct   72.5 kg   IMC 23.7 │
+│  vie 23 oct   73.1 kg   IMC 23.9 │
+│  vie 16 oct   73.4 kg   IMC 24.0 │
 │                             ( + )│
 └──────────────────────────────────┘
 ```
@@ -630,7 +630,7 @@ Se abre como hoja inferior, sin salir de la sesión.
 ├──────────────────────────────────┤
 │  AVISOS                        › │
 │  RESPALDO                      › │
-│    Último: vie 22 oct            │
+│    Último: jue 22 oct            │
 │  GUÍA DE MIUI                  › │
 │    2 de 4 pasos listos           │
 │  MATERIAS                      › │
@@ -657,7 +657,7 @@ Se abre como hoja inferior, sin salir de la sesión.
 │  ┌────────────────────────────┐  │
 │  │     Respaldar ahora        │  │
 │  └────────────────────────────┘  │
-│  Último: vie 22 oct, 21:15       │
+│  Último: jue 22 oct, 21:15       │
 │                                  │
 │  Restaurar respaldo            › │
 │  Guardar una copia en otra       │
